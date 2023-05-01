@@ -7,14 +7,8 @@ import helmet from "helmet";
 import morgan from "morgan";
 
 // Import routes
-import dashboardRoutes from "./routes/dashboard.js";
-import reservationListRoutes from "./routes/reservationList.js";
-import roomRackRoutes from "./routes/roomRack.js";
-import customerRoutes from "./routes/customer.js";
-import analyticsRoutes from "./routes/analytics.js";
-import inventoryRoutes from "./routes/inventory.js";
-import chatRoutes from "./routes/chat.js";
-import settingsRoutes from "./routes/settings.js";
+import userRoutes from "./routes/auth.js";
+import dashboardRoutes from "./routes/client.js"
 
 // Load environment variables
 dotenv.config();
@@ -30,14 +24,12 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
 
 // Set up routes
-app.use('/dashboard', dashboardRoutes);
-app.use('/reservation-list', reservationListRoutes);
-app.use('/room-rack', roomRackRoutes);
-app.use('/customer', customerRoutes);
-app.use('/analytics', analyticsRoutes);
-app.use('/inventory', inventoryRoutes);
-app.use('/chat', chatRoutes);
-app.use('/settings', settingsRoutes);
+app.use("/auth", userRoutes);
+app.use("/dashboard", dashboardRoutes);
+
+// User authentication routes
+app.post("/register", userController.register);
+app.post("/login", userController.login);
 
 // Set up MongoDB database connection and start server
 const PORT = process.env.PORT || 9000;

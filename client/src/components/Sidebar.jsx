@@ -35,43 +35,34 @@ const navItems = [
   {
     text: "Dashboard",
     icon: <HomeOutlined />,
+    route: "dashboard",
   },
   {
     text: "Reservation List",
     icon: <ListOutlined />,
+    route: "reservation-list",
   },
   {
     text: "Room Rack",
     icon: <BedOutlined />,
+    route: "room-rack",
   },
   {
     text: "Guests",
     icon: <PersonOutlined />,
+    route: "guests",
   },
   {
     text: "Inventory",
     icon: <InventoryOutlined />,
-  },
-  {
-    text: "Analytics",
-    icon: <AnalyticsOutlined />,
-  },
-  {
-    text: "Billing",
-    icon: <PaymentsOutlined />,
-  },
-  {
-    text: "Maintenance",
-    icon: <EngineeringOutlined />,
+    route: "inventory",
   },
   {
     text: "Chat",
     icon: <ChatOutlined />,
+    route: "chat",
   },
-  {
-    text: "Settings",
-    icon: <SettingsOutlined />,
-  },
+
 ];
 
 const Sidebar = ({
@@ -113,9 +104,7 @@ const Sidebar = ({
             <Box m="1.5rem 2rem 2rem 3rem">
               <FlexBetween color={theme.palette.secondary.main}>
                 <Box display="flex" alignItems="center" gap="0.5rem">
-                  <Typography variant="h4" fontWeight="bold">
-                    CASA HOTEL
-                  </Typography>
+                  
                 </Box>
                 {!isNonMobile && (
                   <IconButton onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
@@ -125,7 +114,7 @@ const Sidebar = ({
               </FlexBetween>
             </Box>
             <List>
-              {navItems.map(({ text, icon }) => {
+              {navItems.map(({ text, icon, route }) => {
                 if (!icon) {
                   return (
                     <Typography key={text} sx={{ m: "2.25rem 0 1rem 3rem" }}>
@@ -139,7 +128,7 @@ const Sidebar = ({
                   <ListItem key={text} disablePadding>
                     <ListItemButton
                       onClick={() => {
-                        navigate(`/${lcText}`);
+                        navigate(route);
                         setActive(lcText);
                       }}
                       sx={{
