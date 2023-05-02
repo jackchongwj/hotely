@@ -1,5 +1,4 @@
 import { useState } from "react";
-import PropTypes from "prop-types";
 import {
   Table,
   TableRow,
@@ -9,27 +8,16 @@ import {
   TableHead,
   TablePagination,
   TextField,
-  Typography,
 } from "@mui/material";
-import { makeStyles } from "@mui/styles";
+
 import { TableSortLabel } from "@mui/material";
-import { useLocation } from "react-router-dom";
 
-const useStyles = makeStyles({
-  table: {
-    minWidth: 650,
-  },
-});
-
-const DataTable = ({ columns, rows }) => {
-  const classes = useStyles();
-  const location = useLocation();
-  const [page, setPage] = useState(0);
+const DataTable = ({ columns, rows, currentPage=0 }) => {
+  const [page, setPage] = useState(currentPage);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState(columns[0].id);
   const [sortDirection, setSortDirection] = useState("asc");
-  const [currentPage, setCurrentPage] = useState(currentPage || 0);
 
   const handlePageChange = (event, newPage) => {
     setPage(newPage);
@@ -88,7 +76,7 @@ const DataTable = ({ columns, rows }) => {
       />
 
       <TableContainer>
-        <Table className={classes.table}>
+        <Table>
           <TableHead>
             <TableRow>
               {columns.map((column) => (
@@ -129,7 +117,7 @@ const DataTable = ({ columns, rows }) => {
         onRowsPerPageChange={handleRowsPerPageChange}
       />
     </>
-    );
-  };
-  
-  export default DataTable;
+  );
+};
+
+export default DataTable;

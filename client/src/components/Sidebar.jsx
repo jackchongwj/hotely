@@ -17,12 +17,9 @@ import {
     ChevronRightOutlined,
     HomeOutlined,
     ListOutlined,
-    PaymentsOutlined,
-    EngineeringOutlined,
     BedOutlined,
     InventoryOutlined,
     PersonOutlined,
-    AnalyticsOutlined,
     ChatOutlined,
     SettingsOutlined
 } from "@mui/icons-material";
