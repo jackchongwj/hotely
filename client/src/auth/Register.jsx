@@ -76,7 +76,7 @@ const Register = () => {
     e.preventDefault();
 
     console.log(fname, lname, email, password);
-    fetch("http://localhost:5001/auth", {
+    fetch("http://localhost:5001/auth/register", {
       method: "POST",
       crossDomain: true,
       headers: {

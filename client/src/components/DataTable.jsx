@@ -79,6 +79,17 @@ const DataTable = ({ columns, rows, currentPage=0 }) => {
         <Table>
           <TableHead>
             <TableRow>
+              <TableCell colSpan={columns.length}>
+                <TextField
+                  label="Search"
+                  variant="outlined"
+                  margin="normal"
+                  value={searchTerm}
+                  onChange={handleSearch}
+                />
+              </TableCell>
+            </TableRow>
+            <TableRow>
               {columns.map((column) => (
                 <TableCell
                   key={column.id}
@@ -95,6 +106,7 @@ const DataTable = ({ columns, rows, currentPage=0 }) => {
               ))}
             </TableRow>
           </TableHead>
+
           <TableBody>
             {paginatedRows.map((row, index) => (
               <TableRow key={index}>

@@ -55,28 +55,7 @@ const ReservationList = () => {
     { id: 4, name: 'Alice Lee', roomNumber: 104, checkInDate: '2023-05-04', checkOutDate: '2023-05-08' },
   ];
 
-//   useEffect(() => {
-    // const fetchData = async () => {
-    //   try {
-    //     const response = await fetch("/api/reservations"); // make API call to retrieve data
-    //     const json = await response.json();
-    //     setData(json);
-    //     setLoading(false);
-    //   } catch (error) {
-    //     setError(error);
-    //     setLoading(false);
-    //   }
-    // };
-    // fetchData();
-//   }, []);
 
-//   if (loading) {
-//     return <p>Loading data...</p>;
-//   }
-
-//   if (error) {
-//     return <p>Error loading data: {error.message}</p>;
-//   }
 
 return (
     <Box m="1.5rem 2.5rem">

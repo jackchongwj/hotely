@@ -28,8 +28,8 @@ app.use("/auth", userRoutes);
 app.use("/dashboard", dashboardRoutes);
 
 // User authentication routes
-app.post("/register", userController.register);
-app.post("/login", userController.login);
+// app.post("/register", userController.register);
+// app.post("/login", userController.login);
 
 // Set up MongoDB database connection and start server
 const PORT = process.env.PORT || 9000;

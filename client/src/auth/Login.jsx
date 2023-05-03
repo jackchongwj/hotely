@@ -66,7 +66,7 @@ const Login = () => {
     e.preventDefault();
 
     console.log(email, password);
-    fetch("http://localhost:5001/auth", {
+    fetch("http://localhost:5001/auth/login", {
       method: "POST",
       crossDomain: true,
       headers: {

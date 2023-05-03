@@ -6,5 +6,6 @@ const router = express.Router();
 
 // Dashboard route
 router.get('/', requireAuth, dashboard);
+router.get('/dashboard', requireAuth, dashboard);
 
 export default router;
