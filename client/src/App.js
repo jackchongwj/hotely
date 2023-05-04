@@ -66,7 +66,7 @@ function App() {
                   token === 'null' ? (
                     <Navigate to='/login' replace />
                   ) : (
-                    <ReservationList />
+                    <RoomRack />
                   )
                 }
               />
@@ -76,7 +76,7 @@ function App() {
                   token === 'null' ? (
                     <Navigate to='/login' replace />
                   ) : (
-                    <ReservationList />
+                    <Guests />
                   )
                 }
               />
@@ -86,7 +86,7 @@ function App() {
                   token === 'null' ? (
                     <Navigate to='/login' replace />
                   ) : (
-                    <ReservationList />
+                    <Inventory />
                   )
                 }
               />
@@ -96,7 +96,7 @@ function App() {
                   token === 'null' ? (
                     <Navigate to='/login' replace />
                   ) : (
-                    <ReservationList />
+                    <Chat />
                   )
                 }
               />
