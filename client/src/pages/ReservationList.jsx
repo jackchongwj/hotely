@@ -1,75 +1,121 @@
-import React, { useEffect, useState } from "react";
-import DataTable from "../components/DataTable";
-import FlexBetween from "../components/FlexBetween";
-import { DataGrid } from "@mui/x-data-grid";
+import React, { useState } from "react";
+import { DataGridPro } from "@mui/x-data-grid-pro";
 import {
-    Box,
-    Button,
-    Typography,
-    useTheme,
-    useMediaQuery,
-  } from "@mui/material";
+  Box,
+  Typography,
+  Button,
+} from "@mui/material";
+
 
 const ReservationList = () => {
-  const theme = useTheme();
-  const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
-  const [ setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [selectedRow, setSelectedRow] = useState(null);
 
-  const numberOfColumns = 5; // define number of columns
-  const numberOfRows = 4; // define number of rows
+  const handleRowClick = (params) => {
+    setSelectedRow(params.id);
+  };
 
   const columns = [
-    {
-      field: "id",
-      headerName: "ID",
-      flex: 1,
-    },
-    {
-      field: "name",
-      headerName: "Name",
-      flex: 0.5,
-    },
-    {
-      field: "roomNumber",
-      headerName: "Room Number",
-      flex: 1,
-    },
-    {
-        field: "checkInDate",
-        headerName: "Check In",
-        flex: 1,
-    },
-    {
-        field: "checkOutDate",
-        headerName: "Check Out",
-        flex: 1,
-    },
-  ]
-  
-  const data = [
-    { id: 1, name: 'John Doe', roomNumber: 101, checkInDate: '2023-05-01', checkOutDate: '2023-05-05' },
-    { id: 2, name: 'Jane Smith', roomNumber: 102, checkInDate: '2023-05-02', checkOutDate: '2023-05-04' },
-    { id: 3, name: 'Bob Johnson', roomNumber: 103, checkInDate: '2023-05-03', checkOutDate: '2023-05-06' },
-    { id: 4, name: 'Alice Lee', roomNumber: 104, checkInDate: '2023-05-04', checkOutDate: '2023-05-08' },
+    { field: "id", headerName: "#", width: 90 },
+    { field: "reservationId", headerName: "Reservation ID", width: 150 },
+    { field: "customerId", headerName: "Customer ID", width: 150 },
+    { field: "numAdults", headerName: "Adults", width: 120 },
+    { field: "numChildren", headerName: "Children", width: 120 },
+    { field: "daysOfStay", headerName: "Days of Stay", width: 150 },
+    { field: "roomType", headerName: "Room Type", width: 150 },
+    { field: "arrivalDate", headerName: "Arrival Date", width: 150 },
+    { field: "leadTime", headerName: "Lead Time", width: 120 },
+    { field: "cancelled", headerName: "Cancelled", width: 120 },
+    { field: "bookingChannel", headerName: "Booking Channel", width: 180 },
   ];
 
+  const rows = [
+    {
+      id: 1,
+      reservationId: "R001",
+      customerId: "C001",
+      numAdults: 2,
+      numChildren: 1,
+      daysOfStay: 4,
+      roomType: "Deluxe",
+      arrivalDate: "2023-05-01",
+      leadTime: 14,
+      cancelled: false,
+      bookingChannel: "Expedia",
+    },
+    {
+      id: 2,
+      reservationId: "R002",
+      customerId: "C002",
+      numAdults: 1,
+      numChildren: 0,
+      daysOfStay: 2,
+      roomType: "Standard",
+      arrivalDate: "2023-05-02",
+      leadTime: 7,
+      cancelled: false,
+      bookingChannel: "Booking.com",
+    },
+    {
+      id: 3,
+      reservationId: "R003",
+      customerId: "C003",
+      numAdults: 2,
+      numChildren: 2,
+      daysOfStay: 3,
+      roomType: "Suite",
+      arrivalDate: "2023-05-03",
+      leadTime: 21,
+      cancelled: true,
+      bookingChannel: "Agoda",
+    },
+    {
+      id: 4,
+      reservationId: "R004",
+      customerId: "C004",
+      numAdults: 1,
+      numChildren: 0,
+      daysOfStay: 4,
+      roomType: "Standard",
+      arrivalDate: "2023-05-04",
+      leadTime: 10,
+      cancelled: false,
+      bookingChannel: "Hotels.com",
+    },
+  ];
 
-
-return (
+  return (
     <Box m="1.5rem 2.5rem">
-      <Typography variant="h4">Reservation List</Typography>
-      <Box mt="40px" height="75vh">
-        <DataGrid
-        //   loading={isLoading || !data}
-          getRowId={(row) => row.id}
-          rows={data || []}
+      <Typography variant="h3" sx={{ marginTop: "1rem", marginBottom: "1rem"}}>Reservation List</Typography>
+      <Box display="flex" justifyContent="space-between" mb={2}>
+        <Box display="flex">
+          <Button variant="contained" color="primary" sx={{ mr: 2 }}>
+            Check-in
+          </Button>
+          <Button variant="contained" color="primary" >
+            Check-out
+          </Button>
+        </Box>
+        <Box display="flex">
+          <Button variant="contained" color="primary" sx={{ mr: 2 }}>
+            Add Reservation
+          </Button>
+          <Button variant="contained" color="primary" >
+            Delete Reservation
+          </Button>
+        </Box>
+      </Box>
+      <Box style={{ height: "100%", width: "100%" }}>
+        <DataGridPro
+          rows={rows}
           columns={columns}
+          pageSize={5}
+          onRowClick={handleRowClick}
+          rowSelected={selectedRow !== null}
+          disableMultipleRowSelection
+          selectionModel={selectedRow !== null ? [selectedRow] : []}
         />
       </Box>
     </Box>
-  );
-};
-
+  )
+  }
 export default ReservationList;

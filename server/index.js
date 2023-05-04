@@ -27,10 +27,6 @@ app.use(cors());
 app.use("/auth", userRoutes);
 app.use("/dashboard", dashboardRoutes);
 
-// User authentication routes
-// app.post("/register", userController.register);
-// app.post("/login", userController.login);
-
 // Set up MongoDB database connection and start server
 const PORT = process.env.PORT || 9000;
 mongoose
@@ -39,14 +35,15 @@ mongoose
     useUnifiedTopology: true,
   })
   .then(() => {
-    app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
-
-    /* ONLY ADD DATA ONE TIME */
-    // AffiliateStat.insertMany(dataAffiliateStat);
-    // OverallStat.insertMany(dataOverallStat);
-    // Product.insertMany(dataProduct);
-    // ProductStat.insertMany(dataProductStat);
-    // Transaction.insertMany(dataTransaction);
-    // User.insertMany(dataUser);
+    const server = app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+    const io = require('socket.io')(server, {
+      pingTimeout: 60000,
+      cors:{
+        origin: "https//localhost:3000"
+      }
+    })
+    io.on('connection', (socket) => {
+      console.log("connected to socket.io")
+    })
   })
   .catch((error) => console.log(`${error} did not connect`));

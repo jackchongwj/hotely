@@ -36,10 +36,10 @@ function App() {
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/reservation-list" element={<ReservationList />} />
-              {/* <Route path="/room-rack" element={<RoomRack />} />
+              <Route path="/room-rack" element={<RoomRack />} />
               <Route path="/guests" element={<Guests />} />
               <Route path="/inventory" element={<Inventory />} />
-              <Route path="/chat" element={<Chat />} /> */}
+              <Route path="/chat" element={<Chat />} />
             </Route>
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
