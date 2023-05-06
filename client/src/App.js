@@ -16,7 +16,6 @@ import Login from 'auth/Login'
 import Register from 'auth/Register'
 
 function App() {
-  const isLoggedIn = window.localStorage.getItem('loggedIn')
   const mode = useSelector((state) => state.global.mode)
   const theme = useMemo(() => createTheme(themeSettings(mode)), [mode])
   const token = localStorage.getItem('token')

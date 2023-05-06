@@ -5,7 +5,7 @@ import {
   Menu as MenuIcon,
   Search,
   SettingsOutlined,
-  ArrowDropDownOutlined,
+  ArrowDropDown,
 } from "@mui/icons-material";
 import FlexBetween from "components/FlexBetween";
 import { useDispatch } from "react-redux";
@@ -32,6 +32,9 @@ const Topbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
   const isOpen = Boolean(anchorEl);
   const handleClick = (event) => setAnchorEl(event.currentTarget);
   const handleClose = () => setAnchorEl(null);
+  const handleBranch = (branch) => {
+    // code to handle branch selection
+  };
 
   return (
     <AppBar
@@ -47,17 +50,7 @@ const Topbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
           <IconButton onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
             <MenuIcon />
           </IconButton>
-          <FlexBetween
-            backgroundColor={theme.palette.background.alt}
-            borderRadius="9px"
-            gap="3rem"
-            p="0.1rem 1.5rem"
-          >
-            <InputBase placeholder="Search..." />
-            <IconButton>
-              <Search />
-            </IconButton>
-          </FlexBetween>
+          
         </FlexBetween>
 
         {/* RIGHT SIDE */}
@@ -100,7 +93,7 @@ const Topbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
                   {user.occupation}
                 </Typography>
               </Box>
-              <ArrowDropDownOutlined
+              <ArrowDropDown
                 sx={{ color: theme.palette.secondary[300], fontSize: "25px" }}
               />
             </Button>

@@ -8,7 +8,7 @@ import morgan from 'morgan'
 
 // Import routes
 import userRoutes from './routes/auth.js'
-import dashboardRoutes from './routes/client.js'
+import clientRoutes from './routes/client.js'
 
 // Load environment variables
 dotenv.config()
@@ -25,7 +25,7 @@ app.use(cors())
 
 // Set up routes
 app.use('/auth', userRoutes)
-app.use('/dashboard', dashboardRoutes)
+app.use('/api', clientRoutes)
 
 // Set up MongoDB database connection and start server
 const PORT = process.env.PORT || 9000

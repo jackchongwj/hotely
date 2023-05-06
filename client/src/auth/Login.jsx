@@ -83,7 +83,6 @@ const Login = () => {
       .then((data) => {
         console.log(data)
         if (data.status === 'ok') {
-          alert('login successful')
           window.localStorage.setItem('token', data.data)
           window.localStorage.setItem('loggedIn', true)
           navigate('/dashboard')

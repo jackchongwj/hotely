@@ -9,14 +9,50 @@ import {
   Traffic,
 } from '@mui/icons-material'
 import { Box, Button, Typography, useTheme, useMediaQuery } from '@mui/material'
-import { DataGrid } from '@mui/x-data-grid'
+import Charts from "components/Charts"
 import StatBox from 'components/StatBox'
+import Report from "components/Report"
 
 const Dashboard = () => {
   const theme = useTheme()
   const isNonMediumScreens = useMediaQuery('(min-width: 1200px)')
 
-  const columns = []
+    // Dummy data for the charts
+    const occupancyData = [
+      { channel: 'Direct', count: 12 },
+      { channel: 'OTA', count: 6 },
+    ];
+    const reservationsData = [
+      { roomType: 'Single', count: 8 },
+      { roomType: 'Double', count: 12 },
+    ];
+    const roomsData = [
+      { status: 'Occupied', count: 10 },
+      { status: 'Vacant', count: 8 },
+      { status: 'Dirty', count: 4 },
+    ];
+
+
+    const revenueData = [
+      { date: "2023-05-01", revenue: 1200 },
+      { date: "2023-05-02", revenue: 1500 },
+      { date: "2023-05-03", revenue: 1800 },
+      { date: "2023-05-04", revenue: 2000 },
+      { date: "2023-05-05", revenue: 2200 },
+      { date: "2023-05-06", revenue: 2500 },
+      { date: "2023-05-07", revenue: 2800 },
+      { date: "2023-05-08", revenue: 3000 },
+      { date: "2023-05-09", revenue: 3200 },
+      { date: "2023-05-10", revenue: 3500 },
+      { date: "2023-05-11", revenue: 3800 },
+      { date: "2023-05-12", revenue: 4000 },
+      { date: "2023-05-13", revenue: 4200 },
+      { date: "2023-05-14", revenue: 4500 },
+      { date: "2023-05-15", revenue: 4800 },
+      { date: "2023-05-16", revenue: 5000 },
+      { date: "2023-05-17", revenue: 5200 },
+    ]
+
   const token = localStorage.getItem('token')
   return (
     <>
@@ -53,57 +89,40 @@ const Dashboard = () => {
               },
             }}
           >
+            
             {/* ROW 1 */}
             <StatBox
               title='Current Occupancy'
               value=''
-              increase='+14%'
-              description='Since last month'
-              icon={
-                <Email
-                  sx={{ color: theme.palette.secondary[300], fontSize: '26px' }}
-                />
-              }
             />
             <StatBox
               title='Current Guests'
               value=''
-              increase='+21%'
-              description='Since last month'
-              icon={
-                <PointOfSale
-                  sx={{ color: theme.palette.secondary[300], fontSize: '26px' }}
-                />
-              }
             />
 
             <StatBox
               title='Expected Arrival'
               value=''
-              increase='+5%'
-              description='Since last month'
-              icon={
-                <PersonAdd
-                  sx={{ color: theme.palette.secondary[300], fontSize: '26px' }}
-                />
-              }
             />
             <StatBox
               title='Expected Departure'
               value=''
-              increase='+43%'
-              description='Since last month'
-              icon={
-                <Traffic
-                  sx={{ color: theme.palette.secondary[300], fontSize: '26px' }}
-                />
-              }
             />
-            <Box></Box>
-
-            {/* ROW 2 */}
-            <Box></Box>
+            <Box sx={{ gridColumn: 'span 4'}}>
+            
+              <Charts
+                occupancyData={occupancyData}
+                reservationsData={reservationsData}
+                roomsData={roomsData}
+              />
+            </Box>
+            
+            <Box sx={{ gridColumn: 'span 8' }}>
+              <Report revenueData={revenueData} />
+            </Box>
+            
           </Box>
+          
         </Box>
       )}
     </>

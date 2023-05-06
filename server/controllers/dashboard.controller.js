@@ -17,9 +17,3 @@ export const dashboard = async (req, res) => {
   }
 };
 
-export const reservations = async (req, res) => {
-  try {
-  } catch (err) {
-    res.status(500).json({ err: err.message })
-  }
-}
