@@ -14,7 +14,7 @@ router.get('/guests', requireAuth, dashboard);
 router.get('/inventory', requireAuth, dashboard);
 
 // Reservation routes
-router.post('/reservation-list/create-reservation', createReservation);
+router.post('/reservation-list', createReservation);
 router.put('/reservation-list/:id', cancelReservation);
 
 

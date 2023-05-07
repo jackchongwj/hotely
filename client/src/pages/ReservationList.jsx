@@ -2,12 +2,14 @@ import React, { useState, useEffect } from "react";
 import { DataGridPro } from "@mui/x-data-grid-pro";
 import { Box, Typography, Button } from "@mui/material";
 import axios from "axios";
-import AddReservation from "../components/AddReservation";
+import Dialog from "@mui/material/Dialog";
+import AddReservationDialog from "../components/AddReservationDialog";
 
 const ReservationList = () => {
   const [selectedRow, setSelectedRow] = useState(null);
   const [rows, setRows] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const rowsWithIndex = rows.map((row, index) => ({ ...row, id: index + 1 }));
 
   const columns = [
     { field: "id", headerName: "#", width: 90 },
@@ -27,17 +29,22 @@ const ReservationList = () => {
   ];
 
   useEffect(() => {
-    console.log(localStorage);
     const fetchReservations = async () => {
       try {
-        const token = localStorage.getItem('token'); // get the token from local storage
+        const token = localStorage.getItem("token"); // get the token from local storage
         const config = {
-          headers: { "Authorization": token } // pass the token as a header
+          headers: { Authorization: token }, // pass the token as a header
         };
-        console.log(config)
-        const response = await axios.get("http://localhost:5001/api/reservation-list", config);
-        setRows(response.data);
-        // process the retrieved data
+        const response = await axios.get(
+          "http://localhost:5001/api/reservation-list",
+          config
+        );
+        // filter the reservations where cancelled is false
+        const filteredReservations = response.data.reservations.filter(
+          (reservation) => !reservation.cancelled
+        );
+
+        setRows(filteredReservations);
       } catch (error) {
         console.log(error);
       }
@@ -49,17 +56,12 @@ const ReservationList = () => {
     setSelectedRow(params.id);
   };
 
-  const handleAddReservationClick = () => {
-    setDialogOpen(true);
-  };
-
-  const handleCloseDialog = () => {
-    setDialogOpen(false);
-  };
-
   const createReservation = async (reservation) => {
     try {
-      const response = await axios.post("http://localhost:5001/api/reservation-list/create-reservation", reservation);
+      const response = await axios.post(
+        "http://localhost:5001/api/reservation-list",
+        reservation
+      );
       setRows([...rows, response.data]);
     } catch (error) {
       console.log(error);
@@ -69,17 +71,18 @@ const ReservationList = () => {
 
   const cancelReservation = async (id) => {
     try {
-      await axios.put(`http://localhost:5001/api/reservation-list/cancel-reservation/${id}`);
+      await axios.put(`http://localhost:5001/api/reservation-list/${id}`);
       setRows(rows.filter((row) => row.id !== id));
     } catch (error) {
       console.log(error);
     }
   };
 
-
   return (
     <Box m="1.5rem 2.5rem">
-      <Typography variant="h3" sx={{ marginTop: "1rem", marginBottom: "1rem"}}>Reservation List</Typography>
+      <Typography variant="h3" sx={{ marginTop: "1rem", marginBottom: "1rem" }}>
+        Reservation List
+      </Typography>
       <Box display="flex" justifyContent="space-between" mb={2}>
         <Box display="flex">
           <Button variant="contained" color="primary" sx={{ mr: 2 }}>
@@ -90,25 +93,40 @@ const ReservationList = () => {
           </Button>
         </Box>
         <Box display="flex">
-          <Button variant="contained" color="primary" sx={{ mr: 2 }} onClick={() => handleAddReservationClick}>
+          <Button
+            variant="contained"
+            color="primary"
+            sx={{ mr: 2 }}
+            onClick={() => setDialogOpen(true)}
+          >
             Add Reservation
           </Button>
-          <Button variant="contained" color="primary" onClick={cancelReservation}>
+          <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
+            <AddReservationDialog
+              onSubmit={createReservation}
+              onCancel={() => setDialogOpen(false)}
+            />
+          </Dialog>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={cancelReservation}
+          >
             Delete Reservation
           </Button>
         </Box>
       </Box>
       <DataGridPro
-        rows={rows}
+        rows={rowsWithIndex}
         columns={columns}
-        checkboxSelection
         disableSelectionOnClick
         autoHeight
+        disableMultipleRowSelection
         onRowClick={handleRowClick}
         selectedRows={[selectedRow]}
         pageSize={10}
       />
     </Box>
   );
-  }
+};
 export default ReservationList;

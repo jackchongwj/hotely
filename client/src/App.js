@@ -19,7 +19,7 @@ function App() {
   const mode = useSelector((state) => state.global.mode)
   const theme = useMemo(() => createTheme(themeSettings(mode)), [mode])
   const token = localStorage.getItem('token')
-  console.log('token', token)
+  console.log(token)
   return (
     <div className='app'>
       <BrowserRouter>
@@ -89,7 +89,7 @@ function App() {
                   )
                 }
               />
-              <Route
+              {/* <Route
                 path='/chat'
                 element={
                   token === 'null' ? (
@@ -98,7 +98,7 @@ function App() {
                     <Chat />
                   )
                 }
-              />
+              /> */}
               
             </Route>
             <Route path='*' element={<Navigate to='/' />} />

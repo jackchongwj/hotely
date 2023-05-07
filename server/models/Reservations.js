@@ -26,11 +26,11 @@ const reservationSchema = new mongoose.Schema({
     required: true,
   },
   arrivalDate: {
-    type: String,
+    type: Date,
     required: true,
   },
   departureDate: {
-    type: String,
+    type: Date,
     required: true,
   },
   leadTime: {
