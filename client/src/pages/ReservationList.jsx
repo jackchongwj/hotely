@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { DataGridPro } from "@mui/x-data-grid-pro";
-import { Box, Typography, Button } from "@mui/material";
+import { Box, Typography, Button, Dialog } from "@mui/material";
 import axios from "axios";
-import Dialog from "@mui/material/Dialog";
 import AddReservationDialog from "../components/AddReservationDialog";
 
 const ReservationList = () => {
@@ -36,8 +35,7 @@ const ReservationList = () => {
           headers: { Authorization: token }, // pass the token as a header
         };
         const response = await axios.get(
-          "http://localhost:5001/api/reservation-list",
-          config
+          "http://localhost:5001/api/reservation-list", config
         );
         // filter the reservations where cancelled is false
         const filteredReservations = response.data.reservations.filter(
@@ -59,8 +57,7 @@ const ReservationList = () => {
   const createReservation = async (reservation) => {
     try {
       const response = await axios.post(
-        "http://localhost:5001/api/reservation-list",
-        reservation
+        "http://localhost:5001/api/reservation-list", reservation
       );
       setRows([...rows, response.data]);
     } catch (error) {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { TextField, Button, DialogContent, DialogActions } from "@mui/material";
 
 const AddReservationDialog = ({ onSubmit, onCancel }) => {

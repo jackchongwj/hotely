@@ -1,178 +1,204 @@
-import React, { useState } from "react";
-import {
-  Box,
-  Card,
-  CardContent,
-  CardHeader,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  Typography,
-  IconButton,
-  useTheme,
-  Button,
-} from "@mui/material";
-import { AddCircle } from "@mui/icons-material";
+  import React, { useState, useEffect } from "react";
+  import axios from "axios";
+  import {
+    Box,
+    Card,
+    CardContent,
+    CardHeader,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Select,
+    Typography,
+    IconButton,
+    useTheme,
+    Button,
+    Dialog,
+  } from "@mui/material";
+  import { AddCircle } from "@mui/icons-material";
 
-const RoomRack = () => {
-  const theme = useTheme();
-  const [roomStatus, setRoomStatus] = useState({
-    1: "Clean",
-    2: "Clean",
-    3: "Clean",
-    4: "Clean",
-    5: "Clean",
-    6: "Clean",
-  });
-  // Handle the change of room status dropdown
-  const handleRoomStatusChange = (event, roomId) => {
-    setRoomStatus({ ...roomStatus, [roomId]: event.target.value });
-  };
 
-  const rooms = [
-    {
-      id: 1,
-      number: 101,
-      type: "Standard",
-      status: "Clean",
-      occupied: "Vacant",
-    },
-    {
-      id: 2,
-      number: 102,
-      type: "Standard",
-      status: "Clean",
-      occupied: "Occupied",
-    },
-    {
-      id: 3,
-      number: 103,
-      type: "Deluxe",
-      status: "Clean",
-      occupied: "Reserved",
-    },
-    {
-      id: 4,
-      number: 104,
-      type: "Deluxe",
-      status: "Clean",
-      occupied: "Out of Order",
-    },
-    {
-      id: 5,
-      number: 105,
-      type: "Standard",
-      status: "Clean",
-      occupied: "Vacant",
-    },
-    {
-      id: 6,
-      number: 106,
-      type: "Deluxe",
-      status: "Clean",
-      occupied: "Vacant",
-    },
-  ];
+  const RoomRack = () => {
+    const theme = useTheme();
+    const [rooms, setRooms] = useState([]);
 
-  return (
-    <Box m="1.5rem 2.5rem">
-      <Typography variant="h3" sx={{ marginTop: "1rem", marginBottom: "1rem"}}>Room Rack</Typography>
-      <Box display="flex" justifyContent="space-between" mb={2}>
-        <Box display="flex">
-          <Button variant="contained" color="primary" sx={{ mr: 2 }}>
-            Check-in
-          </Button>
-          <Button variant="contained" color="primary" >
-            Check-out
-          </Button>
-        </Box>
-        <Box display="flex">
-          <Button variant="contained" color="primary" sx={{ mr: 2 }}>
-            Add Room(s)
-          </Button>
-          <Button variant="contained" color="primary" >
-            Delete Room(s)
-          </Button>
-        </Box>
-      </Box>
-      <Box display="flex" flexWrap="wrap" >
-        {rooms.map((room) => (
-          <Card
-            key={room.id}
-            sx={{
-              margin: "1rem",
-              width: "200px", // set the card width
-              height: "250px", // set the card height
-              borderRadius: theme.shape.borderRadius,
-              boxShadow: theme.shadows[2],
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <CardContent sx={{ flexGrow: 1 }}>
-              <FormControl sx={{ minWidth: "100px" }}>
-                <Select
-                  value={roomStatus[room.id] || ""}
-                  onChange={(event) => handleRoomStatusChange(event, room.id)}
-                  sx={{ height: "32px" }}
-                >
-                  <MenuItem value={"Clean"}>Clean</MenuItem>
-                  <MenuItem value={"Dirty"}>Dirty</MenuItem>
-                </Select>
-              </FormControl>
+    useEffect(() => {
+      const fetchRooms = async () => {
+        try {
+          const token = localStorage.getItem("token"); // get the token from local storage
+          const config = {
+            headers: { Authorization: token }, // pass the token as a header
+          };
+          const response = await axios.get(
+            "http://localhost:5001/api/room-rack",
+            config
+          );
+          setRooms(response.data.rooms);
+        } catch (error) {
+          console.log(error);
+        }
+      };
+      fetchRooms();
+    }, []);
+
+    const handleHousekeepingChange = async (id, newHousekeeping) => {
+      try {
+        const token = localStorage.getItem("token"); // get the token from local storage
+        const config = {
+          headers: { Authorization: token }, // pass the token as a header
+        };
+        const response = await axios.put(
+          `http://localhost:5001/api/room-rack/${id}`,
+          { housekeeping: newHousekeeping },
+          config
+        );
+        const updatedRoom = response.data.room;
+        setRooms((prevRooms) =>
+          prevRooms.map((room) => (room._id === updatedRoom._id ? updatedRoom : room))
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    return (
+      <Box m="1.5rem 2.5rem">
+        <Typography variant="h3" sx={{ marginTop: "1rem", marginBottom: "1rem" }}>
+          Room Rack
+        </Typography>
+        <Box display="flex" justifyContent="space-between" mb={2}>
+          <Box sx={{ display: "inline-block" }}>
+            <Box sx={{ display: "flex", alignItems: "center" }}>
               <Box
                 sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
+                  width: "1.5rem",
+                  height: "1.5rem",
+                  borderRadius: "50%",
+                  backgroundColor: "green",
+                  mr: 0.5,
                 }}
-              >
-                <Typography
-                  variant="subtitle1"
+              ></Box>
+              <Typography variant="subtitle1" sx={{ fontSize: "0.9rem", mr: 2 }}>
+                Vacant
+              </Typography>
+              <Box
+                sx={{
+                  width: "1.5rem",
+                  height: "1.5rem",
+                  borderRadius: "50%",
+                  backgroundColor: "yellow",
+                  mr: 0.5,
+                }}
+              ></Box>
+              <Typography variant="subtitle1" sx={{ fontSize: "0.9rem", mr: 2 }}>
+                Occupied
+              </Typography>
+              <Box
+                sx={{
+                  width: "1.5rem",
+                  height: "1.5rem",
+                  borderRadius: "50%",
+                  backgroundColor: "blue",
+                  mr: 0.5,
+                }}
+              ></Box>
+              <Typography variant="subtitle1" sx={{ fontSize: "0.9rem", mr: 2 }}>
+                Reserved
+              </Typography>
+              <Box
+                sx={{
+                  width: "1.5rem",
+                  height: "1.5rem",
+                  borderRadius: "50%",
+                  backgroundColor: "red",
+                  mr: 0.5,
+                }}
+              ></Box>
+              <Typography variant="subtitle1" sx={{ fontSize: "0.9rem" }}>
+                Out of Order
+              </Typography>
+            </Box>
+          </Box>
+        </Box>
+
+        <Box display="flex" flexWrap="wrap" justifyContent="center">
+          {rooms.map((room) => (
+            <Card
+              key={room._id}
+              sx={{
+                margin: "1rem",
+                width: "200px", // set the card width
+                height: "250px", // set the card height
+                borderRadius: theme.shape.borderRadius,
+                boxShadow: theme.shadows[2],
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <CardContent sx={{ flexGrow: 1 }}>
+                <FormControl variant="standard" sx={{ mb: 2, minWidth: "100%" }}>
+                  <Select
+                    value={room.housekeeping}
+                    onChange={(e) =>
+                      handleHousekeepingChange(room._id, e.target.value)
+                    }
+                  >
+                    <MenuItem value="Clean">Clean</MenuItem>
+                    <MenuItem value="Dirty">Dirty</MenuItem>
+                  </Select>
+                </FormControl>
+                <Box
                   sx={{
-                    fontSize: 60,
-                    color: 
-                    room.occupied === "Vacant"
-                    ? "green"
-                    : room.occupied === "Occupied"
-                    ? "yellow"
-                    : room.occupied === "Reserved"
-                    ? "blue"
-                    : room.occupied === "Out of Order"
-                    ? "red"
-                    : "black",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
                   }}
                 >
-                  {room.number}
-                </Typography>
-              </Box>
+                  <Typography
+                    variant="subtitle1"
+                    sx={{
+                      fontSize: 60,
+                      color:
+                        room.roomStatus === "Vacant"
+                          ? "green"
+                          : room.roomStatus === "Occupied"
+                          ? "yellow"
+                          : room.roomStatus === "Reserved"
+                          ? "blue"
+                          : room.roomStatus === "Out of Order"
+                          ? "red"
+                          : "black",
+                    }}
+                  >
+                    {room.roomNumber}
+                  </Typography>
+                </Box>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                  }}
+                >
+                  <Typography variant="subtitle1">{room.roomType}</Typography>
+                </Box>
+              </CardContent>
               <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                }}
+                display="flex"
+                alignItems="center"
+                justifyContent="flex-end"
+                sx={{ padding: "0.5rem" }}
               >
-                <Typography variant="subtitle1">{room.type}</Typography>
+                <IconButton>
+                  <AddCircle />
+                </IconButton>
               </Box>
-            </CardContent>
-            <Box
-              display="flex"
-              alignItems="center"
-              justifyContent="flex-end"
-              sx={{ padding: "0.5rem" }}
-            >
-              <IconButton>
-                <AddCircle />
-              </IconButton>
-            </Box>
-          </Card>
-        ))}
+            </Card>
+          ))}
+        </Box>
       </Box>
-    </Box>
-  );
-};
-export default RoomRack;
+    );
+  };
+  export default RoomRack;
