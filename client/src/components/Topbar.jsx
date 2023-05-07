@@ -24,14 +24,20 @@ import {
   useTheme,
 } from "@mui/material";
 
-const Topbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
+const Topbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
   const dispatch = useDispatch();
   const theme = useTheme();
 
+  const user = JSON.parse(localStorage.getItem("user"))
+
   const [anchorEl, setAnchorEl] = useState(null);
+  const [anchorEl1, setAnchorEl1] = useState(null);
   const isOpen = Boolean(anchorEl);
+  const isOpen1 = Boolean(anchorEl1);
   const handleClick = (event) => setAnchorEl(event.currentTarget);
+  const handleClick1 = (event) => setAnchorEl1(event.currentTarget);
   const handleClose = () => setAnchorEl(null);
+  const handleClose1 = () => setAnchorEl1(null);
   const handleBranch = (branch) => {
     // code to handle branch selection
   };
@@ -62,10 +68,34 @@ const Topbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
               <LightModeOutlined sx={{ fontSize: "25px" }} />
             )}
           </IconButton>
-          <IconButton>
+          {/* <IconButton>
             <SettingsOutlined sx={{ fontSize: "25px" }} />
-          </IconButton>
-
+          </IconButton> */}
+          <FlexBetween>
+            <Button
+              onClick={handleClick1}
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                textTransform: "none",
+                gap: "1rem",
+              }}
+            >
+              <IconButton>
+                <SettingsOutlined sx={{ fontSize: "25px" }} />
+              </IconButton>
+            </Button>
+            <Menu
+              anchorEl={anchorEl1}
+              open={isOpen1}
+              onClose={handleClose1}
+              anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+            >
+              <MenuItem onClick={handleClose1}>View Profile</MenuItem>
+              <MenuItem onClick={handleClose1}>All Users</MenuItem>
+            </Menu>
+          </FlexBetween>
           <FlexBetween>
             <Button
               onClick={handleClick}
@@ -84,7 +114,7 @@ const Topbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
                   fontSize="0.85rem"
                   sx={{ color: theme.palette.secondary[100] }}
                 >
-                  {user.name}
+                  {`${user.fname} ${user.lname}`}
                 </Typography>
                 <Typography
                   fontSize="0.75rem"

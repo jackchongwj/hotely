@@ -23,7 +23,7 @@ const Layout = () => {
       />
       <Box flexGrow={1}>
         <Topbar
-          user={data || {}}
+          // user={data || {}}
           isSidebarOpen={isSidebarOpen}
           setIsSidebarOpen={setIsSidebarOpen}
         />

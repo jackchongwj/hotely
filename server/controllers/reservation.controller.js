@@ -1,4 +1,5 @@
 import Reservation from "../models/Reservations.js";
+// import Customer from "../models/cus"
 
 // Create a new reservation
 export const createReservation = async (req, res) => {
