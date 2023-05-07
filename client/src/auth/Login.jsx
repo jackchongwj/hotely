@@ -85,6 +85,7 @@ const Login = () => {
         if (data.status === 'ok') {
           window.localStorage.setItem('token', data.data)
           window.localStorage.setItem('loggedIn', true)
+          localStorage.setItem("user", JSON.stringify(data.user))
           navigate('/dashboard')
           // window.location.href = '/dashboard'
         }
