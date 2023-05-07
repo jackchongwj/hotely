@@ -38,9 +38,14 @@ const Topbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
   const handleClick1 = (event) => setAnchorEl1(event.currentTarget);
   const handleClose = () => setAnchorEl(null);
   const handleClose1 = () => setAnchorEl1(null);
-  const handleBranch = (branch) => {
-    // code to handle branch selection
-  };
+  const handleLogout = async () => {
+    try {
+      localStorage.removeItem("token"); // remove token from local storage
+      window.location.href = "/login"; // redirect to login page
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   return (
     <AppBar
@@ -68,9 +73,6 @@ const Topbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
               <LightModeOutlined sx={{ fontSize: "25px" }} />
             )}
           </IconButton>
-          {/* <IconButton>
-            <SettingsOutlined sx={{ fontSize: "25px" }} />
-          </IconButton> */}
           <FlexBetween>
             <Button
               onClick={handleClick1}
@@ -133,7 +135,7 @@ const Topbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
               onClose={handleClose}
               anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
             >
-              <MenuItem onClick={handleClose}>Log Out</MenuItem>
+              <MenuItem onClick={handleLogout}>Log Out</MenuItem>
             </Menu>
           </FlexBetween>
         </FlexBetween>

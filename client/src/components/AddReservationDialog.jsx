@@ -53,14 +53,14 @@ const AddReservationDialog = ({ onSubmit, onCancel }) => {
         {/* <TextField name="arrivalDate" label="Arrival Date" fullWidth margin="normal" onChange={handleChange} /> */}
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DemoContainer components={['DatePicker']} >
-            <DatePicker name="arrivalDate" label="Arrival Date" onChange={(date)=>handleDateChange(date, "arrivalDate")} />
+            <DatePicker name="arrivalDate" label="Arrival Date" sx={{ width: "100%" }} onChange={(date)=>handleDateChange(date, "arrivalDate")} />
           </DemoContainer>
         </LocalizationProvider>
         {/* <TextField name="departureDate" label="Departure Date" fullWidth margin="normal" onChange={handleChange} /> */}
         
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DemoContainer components={['DatePicker']} >
-            <DatePicker name="departureDate" label="Departure Date" onChange={(date)=>handleDateChange(date, "departureDate")} />
+            <DatePicker name="departureDate" label="Departure Date" sx={{ width: "100%" }} onChange={(date)=>handleDateChange(date, "departureDate")} />
           </DemoContainer>
         </LocalizationProvider>
 

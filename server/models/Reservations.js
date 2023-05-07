@@ -57,6 +57,6 @@ reservationSchema.statics.cancelById = async function (id, update, options) {
     return reservation;
   };
   
-const Reservation = mongoose.model('Reservation', reservationSchema);
+const Reservations = mongoose.model('Reservations', reservationSchema);
 
-export default Reservation;
+export default Reservations;

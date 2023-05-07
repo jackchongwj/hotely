@@ -7,7 +7,6 @@ import { createRoom, editRoom, getAllRooms, deleteRoom } from '../controllers/ro
 const router = express.Router();
 
 // Dashboard route
-router.get('/', requireAuth, dashboard);
 router.get('/dashboard', requireAuth, dashboard);
 router.get('/reservation-list', requireAuth, getAllReservations);
 router.get('/room-rack', requireAuth, getAllRooms);

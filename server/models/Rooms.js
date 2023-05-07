@@ -1,6 +1,6 @@
 import mongoose, { mongo } from "mongoose";
 
-const roomsSchema = new mongoose.Schema({
+const roomSchema = new mongoose.Schema({
     roomNumber: {
         type: Number,
         required: true,
@@ -19,6 +19,6 @@ const roomsSchema = new mongoose.Schema({
     },
 })
 
-const Rooms = mongoose.model('Rooms', roomsSchema);
+const Rooms = mongoose.model('Rooms', roomSchema);
 
 export default Rooms;

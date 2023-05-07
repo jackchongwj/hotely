@@ -87,7 +87,6 @@ const Login = () => {
           window.localStorage.setItem('loggedIn', true)
           localStorage.setItem("user", JSON.stringify(data.user))
           navigate('/dashboard')
-          // window.location.href = '/dashboard'
         }
       })
   }
