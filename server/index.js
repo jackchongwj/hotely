@@ -7,7 +7,7 @@ import helmet from 'helmet'
 import morgan from 'morgan'
 
 // Import routes
-import userRoutes from './routes/auth.js'
+import authRoutes from './routes/auth.js'
 import clientRoutes from './routes/client.js'
 
 // Load environment variables
@@ -24,7 +24,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(cors())
 
 // Set up routes
-app.use('/auth', userRoutes)
+app.use('/auth', authRoutes)
 app.use('/api', clientRoutes)
 
 // Set up MongoDB database connection and start server

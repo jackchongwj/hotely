@@ -37,6 +37,7 @@ const ReservationList = () => {
         const response = await axios.get(
           "http://localhost:5001/api/reservation-list", config
         );
+        console.log(response)
         // filter the reservations where cancelled is false
         const filteredReservations = response.data.reservations.filter(
           (reservation) => !reservation.cancelled
@@ -120,7 +121,7 @@ const ReservationList = () => {
         autoHeight
         disableMultipleRowSelection
         onRowClick={handleRowClick}
-        selectedRows={[selectedRow]}
+        selectionModel={selectedRow !== null ? [selectedRow] : []}
         pageSize={10}
       />
     </Box>

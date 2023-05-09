@@ -1,5 +1,15 @@
 import Rooms from "../models/Rooms.js";
 
+// Get all rooms
+export const getAllRooms = async (req, res) => {
+  try {
+    const rooms = await Rooms.find();
+    res.status(200).json({ rooms });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
 // Create a new room
 export const createRoom = async (req, res) => {
   try {
@@ -15,7 +25,7 @@ export const createRoom = async (req, res) => {
   }
 };
 
-export const editRoom = async (req, res) => {
+export const updateRoom = async (req, res) => {
   try {
     const { id } = req.params;
     const room = await Rooms.findByIdAndUpdate(
@@ -28,16 +38,6 @@ export const editRoom = async (req, res) => {
       return;
     }
     res.status(200).json({ message: "Room updated successfully", room });
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-};
-
-// Get all rooms
-export const getAllRooms = async (req, res) => {
-  try {
-    const rooms = await Rooms.find();
-    res.status(200).json({ rooms });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
