@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 const reservationSchema = new mongoose.Schema({
   reservationId: {
     type: String,
-    required: true,
   },
   customerId: {
     type: String,
@@ -39,11 +38,13 @@ const reservationSchema = new mongoose.Schema({
   },
   checkedIn: {
     type: Boolean,
-    required: true,
+    // required: true,
+    default: false
   },
   checkedOut: {
     type: Boolean,
-    required: true,
+    // required: true,
+    default: false
   },
 
   bookingChannel: {

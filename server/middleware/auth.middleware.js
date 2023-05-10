@@ -5,7 +5,7 @@ import errorHandler from '../helpers/errorHandler.js';
 
 export const requireAuth = (req, res, next) => {
   const token = req.header('Authorization');
-
+  console.log("tokentoken", token)
   if (!token) {
     return res.status(401).json({ error: 'Authentication failed' });
   }
