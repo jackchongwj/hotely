@@ -3,8 +3,10 @@ import { DataGridPro } from "@mui/x-data-grid-pro";
 import { Box, Typography, Button, Dialog } from "@mui/material";
 import axios from "axios";
 import AddReservationDialog from "../components/AddReservationDialog";
+import DeleteConfirmationDialog from "../components/DeleteConfirmationDialog";
 
 const ReservationList = () => {
+  const [deleteConfirmationDialog, setDeleteConfirmationDialog] = React.useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
   const [rows, setRows] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -66,15 +68,27 @@ const ReservationList = () => {
     }
     setDialogOpen(false);
   };
-
+  
   const cancelReservation = async (id) => {
     try {
+      setDeleteConfirmationDialog(false);
+      if(id == null || id == undefined){
+        return;
+      }
       await axios.put(`http://localhost:5001/api/reservation-list/${id}`);
       setRows(rows.filter((row) => row.id !== id));
     } catch (error) {
       console.log(error);
     }
   };
+
+  const confirmDelete = () => {
+    if(selectedRow == null || selectedRow == undefined){
+      return;
+    }
+    setDeleteConfirmationDialog(true);
+  };
+
 
   return (
     <Box m="1.5rem 2.5rem">
@@ -108,8 +122,7 @@ const ReservationList = () => {
           <Button
             variant="contained"
             color="primary"
-            onClick={cancelReservation}
-          >
+            onClick={confirmDelete}>
             Delete Reservation
           </Button>
         </Box>
@@ -124,6 +137,11 @@ const ReservationList = () => {
         selectionModel={selectedRow !== null ? [selectedRow] : []}
         pageSize={10}
       />
+      <DeleteConfirmationDialog
+            selectedValue={selectedRow}
+            open={deleteConfirmationDialog}
+            onClose={cancelReservation}
+          />
     </Box>
   );
 };
