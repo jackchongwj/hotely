@@ -33,7 +33,7 @@ export const updateGuest = async (req, res) => {
 export const deleteGuest = async (req, res) => {
   try {
     const { id } = req.params;
-    const guest = await Guests.findByIdAndDelete(id);
+    const guest = await Guests.deleteOne({customerId: id})
     if (!guest) throw new Error('Guest not found');
     res.status(200).json({ message: 'Guest deleted successfully', guest });
   } catch (error) {

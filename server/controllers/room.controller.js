@@ -1,3 +1,4 @@
+import Reservations from "../models/Reservations.js";
 import Rooms from "../models/Rooms.js";
 
 // Get all rooms
@@ -53,6 +54,57 @@ export const deleteRoom = async (req, res) => {
       return;
     }
     res.status(200).json({ message: "Room deleted successfully", room });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+// Get all room numbers for registrations.
+export const getAvailableRoomNumberForType = async (req, res) => {
+  try {
+    const { type } = req.params;
+    const rooms = await Rooms.find({roomType: type});
+    res.status(200).json({ rooms });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+// checkIn 
+export const checkIn = async (req, res) => {
+  try {
+    const { revId, roomId } = req.params;
+    const reservation = await Reservations.findByIdAndUpdate(
+      revId,
+      { checkedIn: true , roomId: Number(roomId)}
+    );
+    console.log("resv, rom" , reservation, roomId);
+    const room = await Rooms.findOneAndUpdate(
+      roomId,
+      { roomStatus : "Occupied" }
+    );
+    console.log("rom, rom" , room, roomId);
+    res.status(200).json({ message : "checked In" });
+  } catch (error) {
+    console.log(error)
+    res.status(400).json({ message: error.message });
+  }
+};
+
+// checkOut
+export const checkOutFromRoom = async (req, res) => {
+  try {
+    const { roomId } = req.params;
+    const reservation = await Reservations.findOneAndUpdate(
+      {roomId: roomId},
+      { checkedIn: false },
+      { roomId: null}
+    );
+    const room = await Rooms.findByIdAndUpdate(
+      roomId,
+      { roomStatus : "Vacant" }
+    );
+    res.status(200).json({ reservations });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }

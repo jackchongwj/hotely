@@ -4,6 +4,7 @@ const guestSchema = new mongoose.Schema({
   customerId: {
     type: String,
     required: true,
+    unique: true
   },
   firstName: {
     type: String,

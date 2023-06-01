@@ -1,8 +1,10 @@
 import mongoose from "mongoose";
+import Inc from "mongoose-sequence";
+const AutoIncrement = Inc(mongoose);
 
 const reservationSchema = new mongoose.Schema({
   reservationId: {
-    type: String,
+    type: Number
   },
   customerId: {
     type: String,
@@ -51,10 +53,16 @@ const reservationSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  roomId: {
+    type: Number,
+    required: false,
+  }
 });
 
+reservationSchema.plugin(AutoIncrement, {id:'reservation_id_seq',inc_field: 'reservationId'});
+
 reservationSchema.statics.cancelById = async function (id, update, options) {
-    const reservation = await this.findByIdAndUpdate(id, update, options);
+    const reservation = await this.findOneAndUpdate(id, update, options);
     return reservation;
   };
   
