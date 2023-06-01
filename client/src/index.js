@@ -18,7 +18,7 @@ const store = configureStore({
 setupListeners(store.dispatch);
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render( 
+root.render(
   <React.StrictMode>
     <Provider store={store}>
       <App />

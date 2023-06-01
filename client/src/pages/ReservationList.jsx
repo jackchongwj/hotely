@@ -1,13 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { DataGridPro } from "@mui/x-data-grid-pro";
-import { Box, Typography, Button, Dialog } from "@mui/material";
+import { Box, Typography, Button, Dialog, Slide, DialogContent, DialogActions, DialogTitle } from "@mui/material";
 import axios from "axios";
 import AddReservationDialog from "../components/AddReservationDialog";
+import DeleteConfirmationDialog from "../components/DeleteConfirmationDialog";
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 const ReservationList = () => {
+  const [deleteConfirmationDialog, setDeleteConfirmationDialog] = React.useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
+  const [selectedRoomId, setSelectedRoomId] = useState(null);
   const [rows, setRows] = useState([]);
+  const [rooms, setRooms] = useState([]);
+  const [showRooms, setShowRooms] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [roomDialogOpen, setRoomDialogOpen] = useState(false);
   const rowsWithIndex = rows.map((row, index) => ({ ...row, id: index + 1 }));
 
   const columns = [
@@ -57,10 +67,18 @@ const ReservationList = () => {
 
   const createReservation = async (reservation) => {
     try {
+      const token = localStorage.getItem("token"); // get the token from local storage
+      const config = {
+        headers: { Authorization: token }, // pass the token as a header
+      };
       const response = await axios.post(
         "http://localhost:5001/api/reservation-list", reservation
+        , config);
+      const filteredReservations = response.data.reservations.filter(
+        (reservation) => !reservation.cancelled
       );
-      setRows([...rows, response.data]);
+
+      setRows(filteredReservations);
     } catch (error) {
       console.log(error);
     }
@@ -69,12 +87,84 @@ const ReservationList = () => {
 
   const cancelReservation = async (id) => {
     try {
-      await axios.put(`http://localhost:5001/api/reservation-list/${id}`);
+      setDeleteConfirmationDialog(false);
+      if (id == null || id == undefined) {
+        return;
+      }
+      const reservationId = rows[id - 1].reservationId;
+      await axios.put(`http://localhost:5001/api/reservation-list/${reservationId}`);
       setRows(rows.filter((row) => row.id !== id));
     } catch (error) {
       console.log(error);
     }
   };
+
+  const confirmDelete = () => {
+    if (selectedRow == null || selectedRow == undefined) {
+      return;
+    }
+    setDeleteConfirmationDialog(true);
+  };
+
+
+  const checkIn = async (roomNumber) => {
+    setShowRooms(true);
+    setRoomDialogOpen(false)
+    var selectedRowId = rows[selectedRow-1]._id;
+    const token = localStorage.getItem("token"); // get the token from local storage
+    const config = {
+      headers: { Authorization: token }, // pass the token as a header
+    };
+    try {
+      const response = await axios.get(`http://localhost:5001/api/room-rack/checkIn/${selectedRowId}/${roomNumber}`, config);
+      if (response.status == 200) {
+        alert(response.message);
+      }
+    } catch (error){
+      console.log(error)
+    }
+  }
+
+  const checkOut = async () => {
+    var selectedRowId = rows[selectedRow - 1]._id;
+    const token = localStorage.getItem("token"); // get the token from local storage
+    const config = {
+      headers: { Authorization: token }, // pass the token as a header
+    };
+    try {
+      const response = await axios.put(`http://localhost:5001/api//reservation-list/checkOutFromReservations/${selectedRowId}`, config);
+      if (response.status == 200) {
+        console.log(response.message)
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const getAllAvailableReservations = async () => {
+    const token = localStorage.getItem("token"); // get the token from local storage
+    const config = {
+      headers: { Authorization: token }, // pass the token as a header
+    };
+    var roomType = rows[selectedRow - 1].roomType;
+    try {
+      const response = await axios.get(`http://localhost:5001/api/room-rack/getAllAvailableRoomForType/${roomType}`, config);
+      if (response.status != 200 || response.data == null || response.data == undefined || response.data.length <= 0) {
+        return;
+      }
+      if(response.data &&  response.data.rooms &&  response.data.rooms.length > 0){
+        var rooms = response.data.rooms;
+        setRooms(rooms);
+        setShowRooms(true);
+      } else {
+        setRooms([]);
+        setShowRooms(false);
+      }
+      setRoomDialogOpen(true);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   return (
     <Box m="1.5rem 2.5rem">
@@ -83,10 +173,10 @@ const ReservationList = () => {
       </Typography>
       <Box display="flex" justifyContent="space-between" mb={2}>
         <Box display="flex">
-          <Button variant="contained" color="primary" sx={{ mr: 2 }}>
+          <Button variant="contained" color="primary" sx={{ mr: 2 }} onClick={getAllAvailableReservations}>
             Check-in
           </Button>
-          <Button variant="contained" color="primary">
+          <Button variant="contained" color="primary" onClick={checkOut}>
             Check-out
           </Button>
         </Box>
@@ -108,8 +198,7 @@ const ReservationList = () => {
           <Button
             variant="contained"
             color="primary"
-            onClick={cancelReservation}
-          >
+            onClick={confirmDelete}>
             Delete Reservation
           </Button>
         </Box>
@@ -124,6 +213,31 @@ const ReservationList = () => {
         selectionModel={selectedRow !== null ? [selectedRow] : []}
         pageSize={10}
       />
+      <DeleteConfirmationDialog
+        selectedValue={selectedRow}
+        open={deleteConfirmationDialog}
+        onClose={cancelReservation}
+      />
+      <Dialog
+        open={roomDialogOpen}
+        TransitionComponent={Transition}
+        keepMounted
+        onClose={() => { setShowRooms(true); setRoomDialogOpen(false) }}
+      >
+        <DialogTitle>{"Select Room Number to check In"}</DialogTitle>
+        <DialogContent>
+          {
+            showRooms ?
+              rooms.map((item, index) => (
+                <Button onClick={() => { checkIn(item.roomNumber) }}> {item.roomNumber} </Button>
+              ))
+              : null
+          }
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => { setShowRooms(true); setRoomDialogOpen(false) }}>Close</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
