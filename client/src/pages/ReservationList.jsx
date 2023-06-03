@@ -84,7 +84,7 @@ const ReservationList = () => {
     }
     setDialogOpen(false);
   };
-  
+
   const cancelReservation = async (id) => {
     try {
       setDeleteConfirmationDialog(false);
