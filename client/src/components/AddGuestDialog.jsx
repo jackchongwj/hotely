@@ -21,11 +21,7 @@ const AddGuestDialog = ({ onSubmit, onCancel }) => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-
-    console.log("guest", guest)
-
     if (
-      guest.customerId != null &&
       guest.firstName != null &&
       guest.lastName != null &&
       guest.phone != null &&
@@ -43,7 +39,6 @@ const AddGuestDialog = ({ onSubmit, onCancel }) => {
   return (
     <>
       <DialogContent>
-        <TextField name="customerId" label="Customer ID" fullWidth margin="normal" onChange={handleChange} />
         <TextField name="firstName" label="First Name" fullWidth margin="normal" onChange={handleChange} />
         <TextField name="lastName" label="Last Name" fullWidth margin="normal" onChange={handleChange} />
         <TextField name="phone" label="Phone No" fullWidth margin="normal" onChange={handleChange} />

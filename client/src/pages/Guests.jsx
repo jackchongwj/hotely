@@ -4,23 +4,26 @@ import { DataGridPro } from "@mui/x-data-grid-pro";
 import { Box, Typography, Button, Dialog } from "@mui/material";
 import AddGuestDialog from "components/AddGuestDialog";
 import DeleteConfirmationDialog from "components/DeleteConfirmationDialog";
+import EditGuestDialog from "components/EditGuestDialog";
 
 const Guests = () => {
   const [selectedRow, setSelectedRow] = useState(null);
   const [openAddDialog, setOpenAddDialog] = useState(null);
+  const [openEditDialog, setOpenEditDialog] = useState(null);
   const [rows, setRows] = useState([]);
   const rowsWithIndex = rows.map((row, index) => ({ ...row, id: index + 1 }));
   const [deleteConfirmationDialog, setDeleteConfirmationDialog] = React.useState(false);
+  const [reloadList, setReloadList] = React.useState(false);
 
   const columns = [
     { field: "id", headerName: "#", width: 90 },
-    { field: "customerId", headerName: "Customer ID", width: 120 },
+    { field: "uniqueId", headerName: "Customer ID", width: 120 },
     { field: "firstName", headerName: "First Name", width: 120 },
     { field: "lastName", headerName: "Last Name", width: 120 },
     { field: "phone", headerName: "Phone", width: 150 },
     { field: "email", headerName: "Email", width: 180 },
     { field: "identification", headerName: "ID Number", width: 120 },
-    { field: "dateOfBirth", headerName: "DOB", width: 120 },
+    { field: "dateOfBirth", headerName: "DOB", width: 120 , valueFormatter: ({ value }) => `${new Date(value).toLocaleString("en-US")}` },
     { field: "nationality", headerName: "Nationality", width: 120 },
     { field: "address", headerName: "Address", width: 300 },
   ];
@@ -43,7 +46,7 @@ const Guests = () => {
       }
     };
     fetchGuests();
-  }, []);
+  }, [reloadList]);
 
   const handleRowClick = (params) => {
     setSelectedRow(params.id);
@@ -67,13 +70,27 @@ const Guests = () => {
       const response = await axios.post(
         "http://localhost:5001/api/guests", guest
       , config);
-      rows.push(response.data.guest)
+      setReloadList(!reloadList)
     } catch (error) {
       console.log(error);
     }
     setOpenAddDialog(false);
   }
 
+  const edit = async(guest) => {
+    console.log("guest", guest);
+    try {
+      const token = localStorage.getItem("token"); // get the token from local storage
+      const config = {
+        headers: { Authorization: token }, // pass the token as a header
+      };
+      const response = await axios.put(`http://localhost:5001/api/guests/${guest._id}`, guest, config);
+      setReloadList(!reloadList)
+    } catch (error) {
+      console.log(error);
+    }
+    setOpenEditDialog(false);
+  }
     
   const deleteGuest = async (id) => {
     try {
@@ -84,11 +101,15 @@ const Guests = () => {
       const customerID = rows[id-1].customerId;
       await axios.delete(`http://localhost:5001/api/guests/${customerID}`);
       setRows(rows.filter((row) => row.id !== id));
+      setReloadList(!reloadList)
     } catch (error) {
       console.log(error);
     }
   };
 
+  const getGuestByIndex = () => {
+    return rows[selectedRow-1]
+  }
 
   return (
     <Box m="1.5rem 2.5rem">
@@ -106,9 +127,22 @@ const Guests = () => {
               onCancel={() => setOpenAddDialog(false)}
             />
           </Dialog>
-          <Button variant="contained" color="primary">
+          <Button variant="contained" color="primary" onClick={() => {
+              if (selectedRow != null && selectedRow != undefined){
+                setOpenEditDialog(true)
+              } else {
+                alert("Select a Guest to edit.")
+              }
+            }}>
             Edit Guest
           </Button>
+          <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)}>
+            <EditGuestDialog
+              onSubmit={edit}
+              onCancel={() => setOpenEditDialog(false)}
+              fetchedGuest={getGuestByIndex()}
+            />
+          </Dialog>
         </Box>
         <Box display="flex">
           <Button variant="contained" color="primary" sx={{ mr: 2 }} onClick={confirmDelete}>

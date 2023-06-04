@@ -63,7 +63,7 @@ export const deleteRoom = async (req, res) => {
 export const getAvailableRoomNumberForType = async (req, res) => {
   try {
     const { type } = req.params;
-    const rooms = await Rooms.find({roomType: type});
+    const rooms = await Rooms.find({roomType: type, roomStatus: "Vacant"});
     res.status(200).json({ rooms });
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -76,11 +76,11 @@ export const checkIn = async (req, res) => {
     const { revId, roomId } = req.params;
     const reservation = await Reservations.findByIdAndUpdate(
       revId,
-      { checkedIn: true , roomId: Number(roomId)}
+      { checkedIn: true , roomId: roomId}
     );
     console.log("resv, rom" , reservation, roomId);
     const room = await Rooms.findOneAndUpdate(
-      roomId,
+      {roomNumber: roomId},
       { roomStatus : "Occupied" }
     );
     console.log("rom, rom" , room, roomId);
@@ -96,16 +96,34 @@ export const checkOutFromRoom = async (req, res) => {
   try {
     const { roomId } = req.params;
     const reservation = await Reservations.findOneAndUpdate(
-      {roomId: roomId},
-      { checkedIn: false },
-      { roomId: null}
+      { roomId: roomId},
+      { checkedIn: false , roomId: null}
     );
-    const room = await Rooms.findByIdAndUpdate(
-      roomId,
+    const room = await Rooms.findOneAndUpdate(
+      { roomNumber: Number(roomId) },
       { roomStatus : "Vacant" }
     );
-    res.status(200).json({ reservations });
+    res.status(200).json({ room });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
+
+export const changeStatus = async(req, res) => {
+  try {
+    const { roomId , type} = req.params;
+    let typeString = "";
+    if(type == 1){
+      typeString = "Reserved";
+    } else if (type == 2){
+      typeString = "Out of Order";
+    }
+    const room = await Rooms.findOneAndUpdate(
+      { roomNumber: roomId },
+      { roomStatus : typeString }
+    );
+    res.status(200).json({ room});
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+}

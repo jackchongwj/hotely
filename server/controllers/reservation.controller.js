@@ -15,8 +15,11 @@ export const getAllReservations = async (req, res) => {
 export const createReservation = async (req, res) => {
   try {
     const reservation = new Reservations(req.body);
-    await reservation.save();
-    res.status(201).json({ message: "Reservation created successfully", reservation });
+    let savedReservation = await reservation.save();
+    var revId = savedReservation.reservationId
+    let uniqueId = "R" + revId;
+    let reservation1 = await Reservations.findOneAndUpdate({reservationId: revId}, {uniqueId: uniqueId})
+    res.status(201).json({ message: "Reservation created successfully", reservation1 });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -34,6 +37,7 @@ export const cancelReservation = async (req, res) => {
     }
     res.status(200).json({ message: "Reservation cancelled successfully", reservation });
   } catch (error) {
+    console.log(error)
     res.status(400).json({ message: error.message });
   }
 };
@@ -41,7 +45,8 @@ export const cancelReservation = async (req, res) => {
 // Delete a reservation
 export const getAllAvailableReservations = async (req, res) => {
   try {
-    const reservations = await Reservations.where("roomId").ne(null);
+    const { type} = req.params
+    const reservations = await Reservations.find({roomId: null, roomType: type});
     res.status(200).json({ message: "checkd In", reservations });
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -58,9 +63,11 @@ export const checkOutFromReservations = async (req, res) => {
     }
     const roomid = preUpdateReservations.roomId;
     const reservations = await Reservations.findByIdAndUpdate(revId, {checkedIn: false, roomId: null});
-    const room = await Rooms.findByIdAndUpdate(roomid,  { roomStatus : "Vacant" })
+    console.log(roomid);
+    const room = await Rooms.findOneAndUpdate({roomNumber: roomid},  { roomStatus : "Vacant" })
     res.status(200).json({ message: "checked out", reservations });
   } catch (error) {
+    console.log(error);
     res.status(400).json({ message: error.message });
   }
 }

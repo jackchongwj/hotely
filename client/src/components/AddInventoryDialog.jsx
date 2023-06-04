@@ -13,7 +13,6 @@ const AddInventoryDialog = ({ onSubmit, onCancel }) => {
   const handleSubmit = (event) => {
     event.preventDefault();
     if (
-      inventory.code != null &&
       inventory.name != null &&
       inventory.description != null &&
       inventory.type != null &&
@@ -28,7 +27,6 @@ const AddInventoryDialog = ({ onSubmit, onCancel }) => {
   return (
     <>
       <DialogContent>
-        <TextField name="code" label="Stock Code" fullWidth margin="normal" onChange={handleChange} />
         <TextField name="name" label="Stock Name" fullWidth margin="normal" onChange={handleChange} />
         <TextField name="description" label="Stock Description" fullWidth margin="normal" onChange={handleChange} />
         <TextField name="type" label="Stock Type" fullWidth margin="normal" onChange={handleChange} />

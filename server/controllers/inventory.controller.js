@@ -5,6 +5,7 @@ export const getAlInventoryItem = async (req, res) => {
       const inventory = await Inventory.find();
       res.status(200).json({ inventory });
     } catch (error) {
+      console.log(error)
       res.status(400).json({ message: error.message });
     }
   };
@@ -12,9 +13,15 @@ export const getAlInventoryItem = async (req, res) => {
 export const createInventoryItem = async (req, res) => {
   try {
     const inventory = new Inventory(req.body);
-    await inventory.save();
-    res.status(201).json({ message: 'Guest created successfully', inventory });
+    let saveInventory = await inventory.save();
+    var code = saveInventory.code
+    let uniqueId = "I" + code;
+    console.log("code -------- ",code);
+    let inventory1 = await Inventory.findOneAndUpdate({code: code}, {uniqueId: uniqueId})
+    console.log(inventory1);
+    res.status(201).json({ message: 'Guest created successfully', inventory1});
   } catch (error) {
+    console.log(error);
     res.status(400).json({ message: error.message });
   }
 };

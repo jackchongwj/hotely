@@ -1,10 +1,10 @@
 import mongoose from 'mongoose';
+import Inc from "mongoose-sequence";
+const AutoIncrement = Inc(mongoose);
 
 const inventorySchema = new mongoose.Schema({
   code: {
-    type: String,
-    required: true,
-    unique: true,
+    type: Number
   },
   name: {
     type: String,
@@ -27,8 +27,16 @@ const inventorySchema = new mongoose.Schema({
     type: Number,
     required: true,
     min: 0,
-  },
+  }, 
+  uniqueId: {
+    type: String,
+    required: false,
+    unique: true
+  }
 });
+
+inventorySchema.plugin(AutoIncrement, {id:'code_seq',inc_field: 'code'});
+
 
 const Inventory = mongoose.model('Inventory', inventorySchema);
 

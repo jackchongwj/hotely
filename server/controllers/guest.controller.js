@@ -12,8 +12,11 @@ export const getAllGuests = async (req, res) => {
 export const createGuest = async (req, res) => {
   try {
     const guest = new Guests(req.body);
-    await guest.save();
-    res.status(201).json({ message: 'Guest created successfully', guest });
+    let savedGuest = await guest.save();
+    var customerId = savedGuest.customerId
+    let uniqueId = "C" + customerId;
+    let guest1 = await Guests.findOneAndUpdate({customerId: customerId}, {uniqueId: uniqueId})
+    res.status(201).json({ message: 'Guest created successfully', guest1});
   } catch (error) {
     res.status(400).json({ message: error.message });
   }

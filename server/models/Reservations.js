@@ -4,7 +4,7 @@ const AutoIncrement = Inc(mongoose);
 
 const reservationSchema = new mongoose.Schema({
   reservationId: {
-    type: Number
+    type: Number,
   },
   customerId: {
     type: String,
@@ -56,6 +56,11 @@ const reservationSchema = new mongoose.Schema({
   roomId: {
     type: Number,
     required: false,
+  },
+  uniqueId: {
+    type: String,
+    required: false,
+    unique: true
   }
 });
 

@@ -4,17 +4,20 @@ import { DataGridPro } from "@mui/x-data-grid-pro";
 import { Box, Typography, Button, Dialog } from "@mui/material";
 import AddInventoryDialog from "components/AddInventoryDialog";
 import DeleteConfirmationDialog from "components/DeleteConfirmationDialog";
+import EditInventoryDialog from "components/EditInventoryDialog";
 
 const Inventory = () => {
   const [selectedRow, setSelectedRow] = useState(null);
   const [openAddDialog, setOpenAddDialog] = useState(null);
+  const [openEditDialog, setOpenEditDialog] = useState(null);
   const [rows, setRows] = useState([]);
   const rowsWithIndex = rows.map((row, index) => ({ ...row, id: index + 1 }));
   const [deleteConfirmationDialog, setDeleteConfirmationDialog] = React.useState(false);
+  const [reloadList, setReloadList] = React.useState(false);
 
   const columns = [
     { field: "id", headerName: "#", width: 90 },
-    { field: "code", headerName: "Stock Code", width: 150 },
+    { field: "uniqueId", headerName: "Stock Code", width: 150 },
     { field: "name", headerName: "Stock Name", width: 200 },
     { field: "description", headerName: "Stock Description", width: 250 },
     { field: "type", headerName: "Stock Type", width: 150 },
@@ -34,18 +37,32 @@ const Inventory = () => {
           config
         );
         console.log(response)
-        setRows(response.data.guests);
+        setRows(response.data.inventory);
       } catch (error) {
         console.log(error);
       }
     };
     fetchGuests();
-  }, []);
+  }, [reloadList]);
 
   const handleRowClick = (params) => {
     setSelectedRow(params.id);
   };
 
+  const edit = async(inventory) => {
+    console.log("inventory", inventory);
+    try {
+      const token = localStorage.getItem("token"); // get the token from local storage
+      const config = {
+        headers: { Authorization: token }, // pass the token as a header
+      };
+      const response = await axios.put(`http://localhost:5001/api/inventory/${inventory._id}`, inventory, config);
+      setReloadList(!reloadList)
+    } catch (error) {
+      console.log(error);
+    }
+    setOpenEditDialog(false);
+  }
 
   const createInventory = async (inventory) => {
     console.log("inventory", inventory);
@@ -56,7 +73,7 @@ const Inventory = () => {
       };
       const response = await axios.post(
         "http://localhost:5001/api/inventory", inventory , config);
-      rows.push(response.data.inventory)
+      setReloadList(!reloadList)
     } catch (error) {
       console.log(error);
     }
@@ -72,13 +89,18 @@ const Inventory = () => {
 
   const deleteInventory = async (id) => {
     try {
+      const token = localStorage.getItem("token"); // get the token from local storage
+      const config = {
+        headers: { Authorization: token }, // pass the token as a header
+      };
       setDeleteConfirmationDialog(false);
       if(id == null || id == undefined){
         return;
       }
       const inventoryCode = rows[id-1].code;
-      await axios.delete(`http://localhost:5001/api/inventory/${inventoryCode}`);
+      await axios.delete(`http://localhost:5001/api/inventory/${inventoryCode}`, config);
       setRows(rows.filter((row) => row.id !== id));
+      setReloadList(!reloadList )
     } catch (error) {
       console.log(error);
     }
@@ -98,9 +120,22 @@ const Inventory = () => {
               onCancel={() => setOpenAddDialog(false)}
             />
           </Dialog>
-          <Button variant="contained" color="primary">
+          <Button variant="contained" color="primary" onClick={() => setOpenEditDialog(true)}>
             Edit Item
           </Button>
+            <Dialog open={openEditDialog} onClose={() => {
+              if (selectedRow != null && selectedRow != undefined){
+                setOpenEditDialog(true)
+              } else {
+                alert("Select a Inventory to edit.")
+              }
+            }}>
+            <EditInventoryDialog
+              onSubmit={edit}
+              onCancel={() => setOpenEditDialog(false)}
+              fetchedInventory={rows[selectedRow-1]}
+            />
+          </Dialog>
         </Box>
         <Box display="flex">
           <Button variant="contained" color="secondary" sx={{ mr: 2 }} onClick={confirmDelete}>

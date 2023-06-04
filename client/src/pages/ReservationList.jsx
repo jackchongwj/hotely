@@ -19,10 +19,11 @@ const ReservationList = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [roomDialogOpen, setRoomDialogOpen] = useState(false);
   const rowsWithIndex = rows.map((row, index) => ({ ...row, id: index + 1 }));
+  const [reloadList, setReloadList] = useState(false);
 
   const columns = [
     { field: "id", headerName: "#", width: 90 },
-    { field: "reservationId", headerName: "Reservation ID", width: 150 },
+    { field: "uniqueId", headerName: "Reservation ID", width: 150 },
     { field: "customerId", headerName: "Customer ID", width: 150 },
     { field: "numAdults", headerName: "Adults", width: 90 },
     { field: "numChildren", headerName: "Children", width: 90 },
@@ -59,7 +60,7 @@ const ReservationList = () => {
       }
     };
     fetchReservations();
-  }, []);
+  }, [reloadList]);
 
   const handleRowClick = (params) => {
     setSelectedRow(params.id);
@@ -74,11 +75,7 @@ const ReservationList = () => {
       const response = await axios.post(
         "http://localhost:5001/api/reservation-list", reservation
         , config);
-      const filteredReservations = response.data.reservations.filter(
-        (reservation) => !reservation.cancelled
-      );
-
-      setRows(filteredReservations);
+      setReloadList(!reloadList)
     } catch (error) {
       console.log(error);
     }
@@ -91,9 +88,14 @@ const ReservationList = () => {
       if (id == null || id == undefined) {
         return;
       }
+      const token = localStorage.getItem("token"); // get the token from local storage
+      const config = {
+        headers: { Authorization: token }, // pass the token as a header
+      };
       const reservationId = rows[id - 1].reservationId;
-      await axios.put(`http://localhost:5001/api/reservation-list/${reservationId}`);
+      await axios.put(`http://localhost:5001/api/reservation-list/${reservationId}`, {}, config);
       setRows(rows.filter((row) => row.id !== id));
+      setReloadList(!reloadList)
     } catch (error) {
       console.log(error);
     }
@@ -118,8 +120,9 @@ const ReservationList = () => {
     try {
       const response = await axios.get(`http://localhost:5001/api/room-rack/checkIn/${selectedRowId}/${roomNumber}`, config);
       if (response.status == 200) {
-        alert(response.message);
+        alert("Checked In");
       }
+      setReloadList(!reloadList);
     } catch (error){
       console.log(error)
     }
@@ -134,7 +137,8 @@ const ReservationList = () => {
     try {
       const response = await axios.put(`http://localhost:5001/api//reservation-list/checkOutFromReservations/${selectedRowId}`, config);
       if (response.status == 200) {
-        console.log(response.message)
+        setReloadList(!reloadList);
+        alert("Checked Out")
       }
     } catch (error) {
       console.log(error)

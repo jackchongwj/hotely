@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
+import Inc from "mongoose-sequence";
+const AutoIncrement = Inc(mongoose);
 
 const guestSchema = new mongoose.Schema({
   customerId: {
-    type: String,
-    required: true,
-    unique: true
+    type: Number
   },
   firstName: {
     type: String,
@@ -37,8 +37,14 @@ const guestSchema = new mongoose.Schema({
   address: {
     type: String,
     required: true,
-  },
+  },  
+  uniqueId: {
+    type: String,
+    required: false
+  }
 });
+
+guestSchema.plugin(AutoIncrement, {id:'customer_iden_seq',inc_field: 'customerId'});
 
 const Guests = mongoose.model("Guests", guestSchema);
 

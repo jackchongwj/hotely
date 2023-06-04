@@ -11,25 +11,27 @@ import {
   Typography,
   IconButton,
   useTheme,
-  SvgIcon,
-  Popover
+  Slide, Dialog, DialogTitle, DialogContent, DialogActions, Button
 } from "@mui/material";
 import { AddCircle } from "@mui/icons-material";
-import Paper from '@mui/material/Paper';
-import MenuList from '@mui/material/MenuList';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ContentCut from '@mui/icons-material/ContentCut';
-import ContentCopy from '@mui/icons-material/ContentCopy';
-import ContentPaste from '@mui/icons-material/ContentPaste';
+
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="down" ref={ref} {...props} />;
+});
 
 const RoomRack = () => {
   const theme = useTheme();
   const [rooms, setRooms] = useState([]);
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const open = Boolean(anchorEl);
+  const [menus, setMenus] = useState([]);
   const [menuOptions, setMenuOptions] = React.useState([]);
   const [showMsg, setShowMsg] = React.useState(false);
+  const [reservations, setReservations] = useState([]);
+  const [reservationsDialogOpen, setReservationsDialogOpen] = useState(false);
+  const [roomNumber, setRoomNumber] = useState(null);
+  const [reloadList, setReloadList] = useState(false);
+
 
   useEffect(() => {
     const fetchRooms = async () => {
@@ -43,12 +45,14 @@ const RoomRack = () => {
           config
         );
         setRooms(response.data.rooms);
+        const menus = rooms.map(m => false);
+        setMenus(menus);
       } catch (error) {
         console.log(error);
       }
     };
     fetchRooms();
-  }, []);
+  }, [reloadList]);
 
   const handleHousekeepingChange = async (id, newHousekeeping) => {
     try {
@@ -70,44 +74,123 @@ const RoomRack = () => {
     }
   };
 
-  const showReservations = (roomID) => {
+  const checkIn = async (reservationId) => {
+    setReservationsDialogOpen(false);
+    const token = localStorage.getItem("token"); // get the token from local storage
+    const config = {
+      headers: { Authorization: token }, // pass the token as a header
+    };
+    try {
+      const response = await axios.get(`http://localhost:5001/api/room-rack/checkIn/${reservationId}/${roomNumber}`, config);
+      if (response.status == 200) {
+        setReloadList(!reloadList);
+        alert("Checked In");
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const showReservations = async (room,roomIndex) => {
+    const token = localStorage.getItem("token"); // get the token from local storage
+    const config = {
+      headers: { Authorization: token }, // pass the token as a header
+    };
+    var roomType = room.roomType;
+    try {
+      const response = await axios.get(`http://localhost:5001/api/reservation-list/getAllAvailableReservations/${roomType}`, config);
+      if (response.status != 200 || response.data == null || response.data == undefined || response.data.length <= 0) {
+        return;
+      }
+      if (response.data && response.data.reservations && response.data.reservations.length > 0) {
+        var reservations = response.data.reservations;
+        setRoomNumber(room.roomNumber);
+        setReservations(reservations);
+        setReservationsDialogOpen(true);
+      } else {
+        setRoomNumber(null)
+        setReservations([]);
+        setReservationsDialogOpen(false);
+      }
+      menus[roomIndex] = false;
+      setMenus(menus);
+      setAnchorEl(null);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const markStatus = async (room, roomIndex, status) => {
+    try {
+      const token = localStorage.getItem("token"); // get the token from local storage
+      const config = {
+        headers: { Authorization: token }, // pass the token as a header
+      };
+      const roomnumber = room.roomNumber
+      const response = await axios.put(`http://localhost:5001/api/room-rack/changeStatus/${roomnumber}/${status}`, {}, config);
+      if (response.status == 200) {
+        setReloadList(!reloadList);
+        alert("Status updated");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    menus[roomIndex] = false;
+    setMenus(menus);
     setAnchorEl(null);
   }
 
-  const markStatus = (room) => {
-    console.log("markStatus called with roomiD and status: ", room._id, room.roomStatus)
+  const checkout = async (room, roomIndex) => {
+    try {
+      const roomnumber = room.roomNumber
+      const token = localStorage.getItem("token"); // get the token from local storage
+      const config = {
+        headers: { Authorization: token }, // pass the token as a header
+      };
+      const response = await axios.put(`http://localhost:5001/api/room-rack/checkOutFromRoom/${roomnumber}`, {}, config);
+      if (response.status == 200) {
+        setReloadList(!reloadList);
+        alert("Checked Out");
+      }
+    } catch (error) {
+      console.log(error)
+    }
+    menus[roomIndex] = false;
+    setMenus(menus);
     setAnchorEl(null);
   }
 
-  const handleIconClick = (event, roomStatus) => {
-    console.log("my room status is : ", roomStatus)
+  const handleIconClick = (event, roomStatus, roomIndex) => {
+    console.log("roomIndex", roomIndex);
     if (roomStatus == "Vacant") {
       setShowMsg(false);
       setMenuOptions(
-        [{ title: "Check In", callbackMethod: (room) => { showReservations(room) } },
+        [{ title: "Check In", callbackMethod: (room) => { showReservations(room, roomIndex) } },
         {
           title: "Reserve", callbackMethod: (room) => {
-            room.roomStatus = "Reserved";
-            markStatus(room)
+            markStatus(room, roomIndex, "1");
           }
         },
         {
           title: "Out of Order", callbackMethod: (room) => {
-            room.roomStatus = "Out of Order";
-            markStatus(room)
+            markStatus(room, roomIndex, "2");
           }
         }]);
     } else if (roomStatus == "Occupied") {
       setShowMsg(false);
-      setMenuOptions([{ title: "Check Out" }]);
+      setMenuOptions([{ title: "Check Out", callbackMethod: (room) => checkout(room, roomIndex) }]);
     } else {
       setShowMsg(true);
       setMenuOptions([]);
     }
-    setAnchorEl(event.currentTarget);
+    menus[roomIndex] = true;
+    setMenus(menus);
+    setAnchorEl(event.currentTarget)
   };
 
-  const handleIconClose = () => {
+  const handleIconClose = (roomIndex) => {
+    menus[roomIndex] = false;
+    setMenus(menus);
     setAnchorEl(null);
   };
 
@@ -172,7 +255,7 @@ const RoomRack = () => {
       </Box>
 
       <Box display="flex" flexWrap="wrap" justifyContent="center">
-        {rooms.map((room) => (
+        {rooms.map((room, roomIndex) => (
           <Card
             key={room._id}
             sx={{
@@ -241,28 +324,48 @@ const RoomRack = () => {
               justifyContent="flex-end"
               sx={{ padding: "0.5rem" }}
             >
-              <IconButton onClick={(event) => handleIconClick(event, room.roomStatus)}>
+              <IconButton onClick={(event) => handleIconClick(event, room.roomStatus, roomIndex)}>
                 <AddCircle />
               </IconButton>
               <Menu
                 anchorEl={anchorEl}
                 keepMounted
-                open={open}
-                onClose={handleIconClose}
+                open={menus[roomIndex]}
+                onClose={() => { handleIconClose(roomIndex) }}
               >
                 {
                   showMsg ?
-                    <MenuItem value={"dfgh"}> dasdsada </MenuItem>
-                    : menuOptions.map((item, index) => (
-                      <MenuItem key={index} value={item.title} onClick={() => { item.callbackMethod(room) }}>
+                    <MenuItem value={"Room is Reserved / Out Of Order"}> Room is Reserved / Out Of Order </MenuItem>
+                    : menuOptions.map((item, index) => {
+                      return <MenuItem onClick={() => item.callbackMethod(room)} >
                         {item.title}
                       </MenuItem>
-                    ))
+                    }
+
+                    )
                 }
               </Menu>
             </Box>
           </Card>
         ))}
+        <Dialog
+          open={reservationsDialogOpen}
+          TransitionComponent={Transition}
+          keepMounted
+          onClose={() => { setReservationsDialogOpen(false); }}
+        >
+          <DialogTitle>{"Select Reservation to check In"}</DialogTitle>
+          <DialogContent>
+            {
+              reservations.map((item, index) => (
+                <Button onClick={() => { checkIn(item._id) }}> {item.reservationId} </Button>
+              ))
+            }
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => { setReservationsDialogOpen(false) }}>Close</Button>
+          </DialogActions>
+        </Dialog>
       </Box>
     </Box>
   );
