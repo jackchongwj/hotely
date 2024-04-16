@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { DataGridPro } from "@mui/x-data-grid-pro";
+import { DataGrid } from "@mui/x-data-grid";
 import { Box, Typography, Button, Dialog } from "@mui/material";
 import axios from "axios";
 import AddReservationDialog from "./AddReservationDialog";
@@ -30,26 +30,22 @@ const ReservationList = () => {
   useEffect(() => {
     const fetchReservations = async () => {
       try {
-        const token = localStorage.getItem("token"); // get the token from local storage
-        const config = {
-          headers: { Authorization: token }, // pass the token as a header
-        };
-        const response = await axios.get(
-          "http://localhost:5001/api/reservation-list", config
-        );
-        console.log(response)
-        // filter the reservations where cancelled is false
+        const response = await axios.get("http://localhost:5001/api/reservation-list", {
+          withCredentials: true, 
+        });
+        console.log(response);
         const filteredReservations = response.data.reservations.filter(
           (reservation) => !reservation.cancelled
         );
-
+  
         setRows(filteredReservations);
       } catch (error) {
-        console.log(error);
+        console.error('Error fetching reservations:', error);
       }
     };
     fetchReservations();
   }, []);
+  
 
   const handleRowClick = (params) => {
     setSelectedRow(params.id);
@@ -114,7 +110,7 @@ const ReservationList = () => {
           </Button>
         </Box>
       </Box>
-      <DataGridPro
+      <DataGrid
         rows={rowsWithIndex}
         columns={columns}
         disableSelectionOnClick

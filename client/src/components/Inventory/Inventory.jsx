@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { DataGridPro } from "@mui/x-data-grid-pro";
+import { DataGrid } from "@mui/x-data-grid";
 import { Box, Typography, Button } from "@mui/material";
 
 const Inventory = () => {
@@ -61,7 +61,7 @@ const Inventory = () => {
         </Box>
       </Box>
       <Box style={{ height: "100%", width: "100%" }}>
-        <DataGridPro
+        <DataGrid
           rows={rowsWithIndex}
           columns={columns}
           disableSelectionOnClick

@@ -15,6 +15,11 @@ export const createUser = async (req, res) => {
     // Save the user to the database
     await user.save();
 
+    // Save a reference to the refresh token
+    await User.updateOne(
+      { _id: user._id, "refreshTokens.token": refreshToken },
+      { "$set": { "refreshTokens.$.expires": new Date(new Date().getTime() + (7 * 24 * 60 * 60 * 1000)) } } // 7 days from now
+    );
     // Return the newly created user object
     res.status(201).json({
       user,
@@ -27,19 +32,29 @@ export const createUser = async (req, res) => {
 
 export const getUser = async (req, res) => {
   try {
-    const { id } = req.params;
+    // Use the user ID from the JWT, added by the auth middleware
+    const userId = req.userId;
 
     // Retrieve the user from the database
-    const user = await User.findById(id);
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
 
-    // Return the user object
+    // Return the user object, consider omitting sensitive fields
     res.status(200).json({
-      user,
+      user: {
+        id: user._id,
+        fname: user.fname,
+        lname: user.lname,
+        email: user.email,
+      },
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+
 
 export const updateUser = async (req, res) => {
   try {

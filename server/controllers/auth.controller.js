@@ -1,71 +1,138 @@
-import User from '../models/User.js'
-
-import bcrypt from 'bcrypt'
-import jwt from 'jsonwebtoken'
+import User from "../models/User.js";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import crypto from "crypto";
+import RefreshToken from "../models/RefreshToken.js";
+import { ErrorHandler, errorHandler } from '../helpers/error.handler.js';
 
 export const register = async (req, res) => {
   try {
-    const { fname, lname, email, password } = req.body
+    const { fname, lname, email, password } = req.body;
 
-    // Check if user with the email already exists
-    const existingUser = await User.findOne({ email })
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res
-        .status(400)
-        .json({ message: 'User with this email already exists.' })
+      throw new ErrorHandler(400, "User with this email already exists.");
     }
 
-    // Hash password
-    const salt = await bcrypt.genSalt(10)
-    const hashedPassword = await bcrypt.hash(password, salt)
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create new user
-    const newUser = new User({
-      fname,
-      lname,
-      email,
-      password: hashedPassword,
-    })
+    const newUser = new User({ fname, lname, email, password: hashedPassword });
+    await newUser.save();
 
-    // Save the user to the database
-    await newUser.save()
-    console.log('newUser', newUser)
-
-    res
-      .status(201)
-      .json({ message: 'User registered successfully.', status: 'ok' })
+    res.status(201).json({ message: "User registered successfully.", status: "ok" });
   } catch (error) {
-    res.status(500).json({ message: 'Something went wrong.' })
+    errorHandler(res, error, req);
   }
-}
+};
 
 export const login = async (req, res) => {
   try {
-    const { email, password } = req.body
-
-    // Check if user with the email exists
-    const user = await User.findOne({ email })
-    if (!user) {
-      return res.status(400).json({ message: 'Invalid credentials.' })
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      throw new ErrorHandler(400, "Invalid credentials.");
     }
+    
+    const { accessToken, refreshToken } = await generateTokens(user);
 
-    console.log('useruser', user)
+    // Set cookies for tokens
+    setTokenCookies(res, accessToken, refreshToken);
 
-    // Check if the password matches
-    const isPasswordCorrect = await bcrypt.compare(password, user.password)
-    if (!isPasswordCorrect) {
-      return res
-        .status(400)
-        .json({ message: 'Invalid credentials.', redirectUrl: '/dashboard' })
-    }
-
-    // Generate and return JWT token
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: '1d',
-    })
-    res.json({ status: 'ok', data: token, user })
+    res.status(200).json({
+      message: "Logged in successfully",
+      user: { fname: user.fname, lname: user.lname, email: user.email },
+    });
   } catch (error) {
-    console.error(error.message)
-    res.status(500).json({ status: 'error', message: 'Server error' })
+    errorHandler(res, error, req);
   }
-}
+};
+
+const setTokenCookies = (res, accessToken, refreshToken) => {
+  const isProduction = process.env.NODE_ENV === "production";
+
+  let cookieOptions = {
+    httpOnly: true, // Prevents client-side JS from reading the cookie
+    secure: isProduction, // Ensures cookie is sent over HTTPS
+    sameSite: isProduction ? "strict" : "lax", // Adjust based on environment
+  };
+
+  if (!isProduction) {
+    cookieOptions = { ...cookieOptions, secure: false, sameSite: "lax" }; 
+  }
+
+  res.cookie("accessToken", accessToken, { ...cookieOptions, maxAge: 30 * 60 * 1000 }); // 30 minutes
+  res.cookie("refreshToken", refreshToken, { ...cookieOptions, maxAge: 7 * 24 * 60 * 60 * 1000 }); // 7 days
+};
+
+const generateTokens = async (user) => {
+  const accessToken = jwt.sign(
+    { id: user._id, email: user.email }, 
+    process.env.JWT_SECRET, 
+    { expiresIn: "30m" }
+  );
+  
+  const refreshToken = crypto.randomBytes(64).toString('hex');
+  const expiresIn = new Date();
+  expiresIn.setDate(expiresIn.getDate() + 7); // Refresh token expiry 7 days from now
+  
+  // Save or update the refresh token in the database
+  await RefreshToken.findOneAndUpdate(
+    { user: user._id }, 
+    { token: refreshToken, expires: expiresIn }, 
+    { new: true, upsert: true }
+  );
+  
+  return { accessToken, refreshToken };
+};
+
+export const refreshAccessToken = async (req, res) => {
+  const { refreshToken } = req.cookies;
+
+  if (!refreshToken) return res.status(401).json({ message: "Refresh Token Required" });
+
+  try {
+    const refreshTokenDoc = await RefreshToken.findOne({
+      token: refreshToken,
+      expires: { $gte: new Date() }, // Checks if the token hasn't expired
+    }).populate('user');
+
+    if (!refreshTokenDoc) {
+      return res.status(403).json({ message: "Invalid Refresh Token" });
+    }
+
+    // Generate a new access token
+    const accessToken = jwt.sign({ id: refreshTokenDoc.user._id, email: refreshTokenDoc.user.email }, process.env.JWT_SECRET, { expiresIn: "30m" });
+
+    res.json({ accessToken });
+  } catch (error) {
+    res.status(403).json({ message: "Invalid Refresh Token" });
+  }
+};
+
+export const validateRefreshToken = async (token, userEmail) => {
+  try {
+    const refreshTokenDoc = await RefreshToken.findOne({
+      token: token,
+      expires: { $gt: new Date() }, // Ensure the token hasn't expired
+    }).populate('user');
+
+    if (!refreshTokenDoc || !refreshTokenDoc.user) {
+      console.error("Refresh token not found or no associated user.");
+      return { isValid: false, user: null };
+    }
+
+    // Additional validation step: check if the user's email matches the expected email.
+    if (refreshTokenDoc.user.email !== userEmail) {
+      console.error("User details do not match.");
+      return { isValid: false, user: null };
+    }
+
+    // The token and user details are valid
+    return { isValid: true, user: refreshTokenDoc.user };
+  } catch (error) {
+    console.error("Token validation error:", error);
+    return { isValid: false, user: null };
+  }
+};
+

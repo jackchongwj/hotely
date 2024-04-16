@@ -5,10 +5,12 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import helmet from 'helmet'
 import morgan from 'morgan'
+import { Server } from 'socket.io';
 
 // Import routes
 import authRoutes from './routes/auth.js'
 import clientRoutes from './routes/client.js'
+import cookieParser from 'cookie-parser'
 
 // Load environment variables
 dotenv.config()
@@ -21,7 +23,16 @@ app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }))
 app.use(morgan('common'))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
-app.use(cors())
+app.use(cookieParser())
+
+// Define CORS options
+const corsOptions = {
+  origin: 'http://localhost:3000', // or the client's origin in production
+  credentials: true,
+};
+
+// Use CORS with the options
+app.use(cors(corsOptions));
 
 // Set up routes
 app.use('/auth', authRoutes)
@@ -36,12 +47,12 @@ mongoose
   })
   .then(() => {
     const server = app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
-    const io = require('socket.io')(server, {
+    const io = new Server(server, {
       pingTimeout: 60000,
-      cors:{
-        origin: "https//localhost:3000"
-      }
-    })
+      cors: {
+        origin: "http://localhost:3000", 
+      },
+    });
     io.on('connection', (socket) => {
       console.log("connected to socket.io")
     })

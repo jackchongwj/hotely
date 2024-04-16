@@ -16,10 +16,9 @@ import Login from 'components/Auth/Login'
 import Register from 'components/Auth/Register'
 
 function App() {
-  const mode = useSelector((state) => state.global.mode)
-  const theme = useMemo(() => createTheme(themeSettings(mode)), [mode])
-  const token = localStorage.getItem('token')
-  console.log(token)
+  const mode = useSelector((state) => state.global.mode);
+  const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
+
   return (
     <div className='app'>
       <BrowserRouter>
@@ -31,82 +30,36 @@ function App() {
             <Route element={<Layout />}>
               <Route
                 path='/'
-                element={
-                  token === 'null' ? (
-                    <Navigate to='/login' replace />
-                  ) : (
-                    <Navigate to='/dashboard' replace />
-                  )
-                }
+                element={<Navigate to='/dashboard' replace />}
               />
               <Route
                 path='/dashboard'
-                element={
-                  token === 'null' ? (
-                    <Navigate to='/login' replace />
-                  ) : (
-                    <Dashboard />
-                  )
-                }
+                element={<Dashboard />}
               />
               <Route
                 path='/reservation-list'
-                element={
-                  token === 'null' ? (
-                    <Navigate to='/login' replace />
-                  ) : (
-                    <ReservationList />
-                  )
-                }
+                element={<ReservationList />}
               />
               <Route
                 path='/room-rack'
-                element={
-                  token === 'null' ? (
-                    <Navigate to='/login' replace />
-                  ) : (
-                    <RoomRack />
-                  )
-                }
+                element={<RoomRack />}
               />
               <Route
                 path='/guests'
-                element={
-                  token === 'null' ? (
-                    <Navigate to='/login' replace />
-                  ) : (
-                    <Guests />
-                  )
-                }
+                element={<Guests />}
               />
               <Route
                 path='/inventory'
-                element={
-                  token === 'null' ? (
-                    <Navigate to='/login' replace />
-                  ) : (
-                    <Inventory />
-                  )
-                }
+                element={<Inventory />}
               />
-              {/* <Route
-                path='/chat'
-                element={
-                  token === 'null' ? (
-                    <Navigate to='/login' replace />
-                  ) : (
-                    <Chat />
-                  )
-                }
-              /> */}
-              
+              {/* Other protected routes */}
             </Route>
             <Route path='*' element={<Navigate to='/' />} />
           </Routes>
         </ThemeProvider>
       </BrowserRouter>
     </div>
-  )
+  );
 }
 
 export default App

@@ -1,4 +1,4 @@
-import Guests from '../models/Guests.js';
+import Guests from '../models/Guest.js';
 
 export const getAllGuests = async (req, res) => {
     try {

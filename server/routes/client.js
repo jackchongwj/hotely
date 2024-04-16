@@ -12,7 +12,7 @@ router.get('/dashboard', requireAuth, dashboard);
 router.get('/inventory', requireAuth, dashboard);
 
 // Reservation routes
-router.get('/reservation-list', requireAuth,getAllReservations);
+router.get('/reservation-list', requireAuth, getAllReservations);
 router.post('/reservation-list', requireAuth, createReservation);
 router.put('/reservation-list/:id', requireAuth, cancelReservation);
 

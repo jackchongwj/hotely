@@ -4,6 +4,8 @@ import { Box, Button, Typography, TextField } from '@mui/material'
 import logo from 'assets/logo.png'
 import { useNavigate } from 'react-router-dom'
 
+const BASE_URL = process.env.REACT_APP_BASE_URL
+
 const styles = {
   container: {
     display: 'flex',
@@ -64,33 +66,38 @@ const Login = () => {
   }
 
   const handleSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    console.log(email, password)
-    fetch('http://localhost:5001/auth/signin', {
+    console.log(email, password);
+    fetch(`${BASE_URL}/auth/login`, {
       method: 'POST',
-      crossDomain: true,
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
-        'Access-Control-Allow-Origin': '*',
       },
       body: JSON.stringify({
         email,
         password,
       }),
     })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data)
-        if (data.status === 'ok') {
-          window.localStorage.setItem('token', data.data)
-          window.localStorage.setItem('loggedIn', true)
-          localStorage.setItem("user", JSON.stringify(data.user))
-          navigate('/dashboard')
-        }
-      })
-  }
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Failed to login');
+      }
+      return response.json();
+    })
+    .then((data) => {
+      console.log(data);
+      window.localStorage.setItem('loggedIn', true);
+      localStorage.setItem("user", JSON.stringify(data.user)); 
+      navigate('/dashboard');
+    })
+    .catch(error => {
+      console.error('Error occurred logging in:', error);
+    });
+}
+
 
   return (
     <Box sx={styles.container}>

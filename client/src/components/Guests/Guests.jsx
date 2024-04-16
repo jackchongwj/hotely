@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { DataGridPro } from "@mui/x-data-grid-pro";
+import { DataGrid } from "@mui/x-data-grid";
 import { Box, Typography, Button } from "@mui/material";
 
 const Guests = () => {
@@ -24,23 +24,18 @@ const Guests = () => {
   useEffect(() => {
     const fetchGuests = async () => {
       try {
-        const token = localStorage.getItem("token"); // get the token from local storage
-        const config = {
-          headers: { Authorization: token }, // pass the token as a header
-        };
-        const response = await axios.get(
-          "http://localhost:5001/api/guests",
-          config
-        );
-        console.log(response)
+        const response = await axios.get("http://localhost:5001/api/guests", {
+          withCredentials: true, 
+        });
+        console.log(response);
         setRows(response.data.guests);
       } catch (error) {
-        console.log(error);
+        console.error('Error fetching guests:', error);
       }
     };
     fetchGuests();
   }, []);
-
+  
   const handleRowClick = (params) => {
     setSelectedRow(params.id);
   };
@@ -66,7 +61,7 @@ const Guests = () => {
         </Box>
       </Box>
       <Box style={{ height: "100%", width: "100%" }}>
-        <DataGridPro
+        <DataGrid
            rows={rowsWithIndex}
            columns={columns}
            disableSelectionOnClick

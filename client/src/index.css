@@ -27,3 +27,12 @@ body,
 ::-webkit-scrollbar-track:hover {
   background: #21295c;
 }
+
+/* Override autofill styles in WebKit-based browsers */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px white inset !important;
+    -webkit-text-fill-color: black !important;
+}
