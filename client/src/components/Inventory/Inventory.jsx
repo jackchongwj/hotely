@@ -21,22 +21,18 @@ const Inventory = () => {
   useEffect(() => {
     const fetchGuests = async () => {
       try {
-        const token = localStorage.getItem("token"); // get the token from local storage
-        const config = {
-          headers: { Authorization: token }, // pass the token as a header
-        };
-        const response = await axios.get(
-          "http://localhost:5001/api/inventory",
-          config
-        );
-        console.log(response)
-        setRows(response.data.guests);
+        const response = await axios.get("http://localhost:5001/api/inventory", {
+          withCredentials: true, 
+        });
+        console.log(response);
+        setRows(response.data.inventory); 
       } catch (error) {
-        console.log(error);
+        console.error('Error fetching inventory:', error);
       }
     };
     fetchGuests();
   }, []);
+  
 
   const handleRowClick = (params) => {
     setSelectedRow(params.id);

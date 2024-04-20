@@ -25,21 +25,18 @@
     useEffect(() => {
       const fetchRooms = async () => {
         try {
-          const token = localStorage.getItem("token"); // get the token from local storage
-          const config = {
-            headers: { Authorization: token }, // pass the token as a header
-          };
-          const response = await axios.get(
-            "http://localhost:5001/api/room-rack",
-            config
-          );
+          const response = await axios.get("http://localhost:5001/api/room-rack", {
+            withCredentials: true, 
+          });
           setRooms(response.data.rooms);
         } catch (error) {
-          console.log(error);
+          console.error('Error fetching rooms:', error);
         }
       };
       fetchRooms();
-    }, []);
+    }, [theme]);
+};
+
 
     const handleHousekeepingChange = async (id, newHousekeeping) => {
       try {
