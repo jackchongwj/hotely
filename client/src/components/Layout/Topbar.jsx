@@ -10,6 +10,7 @@ import {
 import FlexBetween from "components/Layout/FlexBetween";
 import { useDispatch } from "react-redux";
 import { setMode } from "state";
+import axios from "axios";
 
 import {
   AppBar,
@@ -40,12 +41,13 @@ const Topbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
   const handleClose1 = () => setAnchorEl1(null);
   const handleLogout = async () => {
     try {
-      localStorage.removeItem("token"); // remove token from local storage
+      // The endpoint should clear the cookies
+      await axios.post('http://localhost:5001/auth/logout');
       window.location.href = "/login"; // redirect to login page
     } catch (error) {
-      console.error(error);
+      console.error('Error during logout:', error);
     }
-  }
+  };
 
   return (
     <AppBar
@@ -61,7 +63,7 @@ const Topbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
           <IconButton onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
             <MenuIcon />
           </IconButton>
-          
+
         </FlexBetween>
 
         {/* RIGHT SIDE */}
@@ -74,20 +76,10 @@ const Topbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
             )}
           </IconButton>
           <FlexBetween>
-            <Button
-              onClick={handleClick1}
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                textTransform: "none",
-                gap: "1rem",
-              }}
-            >
-              <IconButton>
-                <SettingsOutlined sx={{ fontSize: "25px" }} />
-              </IconButton>
-            </Button>
+            <IconButton onClick={handleClick1}>
+              <SettingsOutlined sx={{ fontSize: "25px" }} />
+            </IconButton>
+
             <Menu
               anchorEl={anchorEl1}
               open={isOpen1}
@@ -109,7 +101,7 @@ const Topbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                 gap: "1rem",
               }}
             >
-              
+
               <Box textAlign="left">
                 <Typography
                   fontWeight="bold"

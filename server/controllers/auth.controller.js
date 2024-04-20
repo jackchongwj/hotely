@@ -48,6 +48,30 @@ export const login = async (req, res) => {
   }
 };
 
+export const logout = async (req, res) => {
+  try {
+    // Clear the cookies
+    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken');
+
+    // Assuming your refresh token is in a cookie or the request body
+    const { refreshToken } = req.cookies || req.body;
+
+    if (refreshToken) {
+      // Set the refresh token to be expired in the database
+      await RefreshToken.findOneAndUpdate(
+        { token: refreshToken },
+        { expires: new Date(0) } // Date(0) sets the date to Unix epoch time, effectively expiring it
+      );
+    }
+
+    res.status(200).json({ message: 'Successfully logged out' });
+  } catch (error) {
+    res.status(500).json({ error: 'An error occurred during the logout process' });
+  }
+};
+
+
 const setTokenCookies = (res, accessToken, refreshToken) => {
   const isProduction = process.env.NODE_ENV === "production";
 

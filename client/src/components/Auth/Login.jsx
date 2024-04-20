@@ -3,6 +3,7 @@ import { Link as RouterLink } from 'react-router-dom'
 import { Box, Button, Typography, TextField } from '@mui/material'
 import logo from 'assets/logo.png'
 import { useNavigate } from 'react-router-dom'
+import { useUser } from 'state/userContext'
 
 const BASE_URL = process.env.REACT_APP_BASE_URL
 
@@ -56,6 +57,7 @@ const styles = {
 const Login = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const { setUser } = useUser()
   const navigate = useNavigate()
   const handleEmailChange = (e) => {
     setEmail(e.target.value)
@@ -88,9 +90,7 @@ const Login = () => {
       return response.json();
     })
     .then((data) => {
-      console.log(data);
-      window.localStorage.setItem('loggedIn', true);
-      localStorage.setItem("user", JSON.stringify(data.user)); 
+      setUser(data.user);
       navigate('/dashboard');
     })
     .catch(error => {

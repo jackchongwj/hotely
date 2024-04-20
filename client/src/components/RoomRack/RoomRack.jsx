@@ -35,8 +35,6 @@
       };
       fetchRooms();
     }, [theme]);
-};
-
 
     const handleHousekeepingChange = async (id, newHousekeeping) => {
       try {
