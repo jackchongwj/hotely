@@ -5,12 +5,15 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import helmet from 'helmet'
 import morgan from 'morgan'
+import cookieParser from 'cookie-parser'
+
 import { Server } from 'socket.io';
 
 // Import routes
-import authRoutes from './routes/auth.js'
-import clientRoutes from './routes/client.js'
-import cookieParser from 'cookie-parser'
+import authRoutes from './routes/auth.routes.js'
+import clientRoutes from './routes/client.routes.js'
+import chatRoutes from './routes/chat.routes.js'
+import userRoutes from './routes/user.routes.js'
 
 // Load environment variables
 dotenv.config()
@@ -37,6 +40,12 @@ app.use(cors(corsOptions));
 // Set up routes
 app.use('/auth', authRoutes)
 app.use('/api', clientRoutes)
+
+// Example of logging middleware
+app.use((req, res, next) => {
+  console.log(`Incoming request: ${req.method} ${req.path}`);
+  next();
+});
 
 // Set up MongoDB database connection and start server
 const PORT = process.env.PORT || 9000

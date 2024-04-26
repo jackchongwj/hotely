@@ -16,6 +16,8 @@ import Chat from 'components/Chat/Chat';
 import Login from 'components/Auth/Login';
 import Register from 'components/Auth/Register';
 
+import 'state/authInterceptor' // Just importing it will set up the interceptors
+
 function App() {
   const mode = useSelector((state) => state.global.mode);
   const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);

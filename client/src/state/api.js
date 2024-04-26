@@ -13,10 +13,6 @@ export const api = createApi({
   reducerPath: 'hotelApi',
   tagTypes: ['User', 'Dashboard', 'Reservations', 'Rooms', 'Guests', 'Inventory', 'Chat'],
   endpoints: (build) => ({
-    getUser: build.query({
-      query: (id) => `user/${id}`,
-      providesTags: ['User'],
-    }),
     getDashboard: build.query({
       query: () => 'dashboard',
       providesTags: ['Dashboard'],
@@ -71,7 +67,6 @@ export const api = createApi({
 });
 
 export const {
-  useGetUserQuery,
   useGetReservationsQuery,
   useGetRoomsQuery,
   useGetGuestsQuery,

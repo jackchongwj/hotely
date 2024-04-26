@@ -111,7 +111,7 @@ const generateTokens = async (user) => {
 };
 
 export const refreshAccessToken = async (req, res) => {
-  const { refreshToken } = req.cookies;
+  const { refreshToken } = req.cookies;  // Assuming cookie-parser middleware is used
 
   if (!refreshToken) return res.status(401).json({ message: "Refresh Token Required" });
 
@@ -126,37 +126,56 @@ export const refreshAccessToken = async (req, res) => {
     }
 
     // Generate a new access token
-    const accessToken = jwt.sign({ id: refreshTokenDoc.user._id, email: refreshTokenDoc.user.email }, process.env.JWT_SECRET, { expiresIn: "30m" });
+    const accessToken = jwt.sign({
+      id: refreshTokenDoc.user._id,
+      email: refreshTokenDoc.user.email
+    }, process.env.JWT_SECRET, { expiresIn: "30m" });
 
-    res.json({ accessToken });
+    // Set the new access token in an HTTP-only cookie
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', // use secure cookies in production
+      sameSite: 'strict' // this setting can be adjusted based on your requirements
+    });
+
+    res.json({ accessToken }); // Optionally, you might decide to stop sending the accessToken in the JSON response
   } catch (error) {
+    console.error("Error refreshing access token:", error);
     res.status(403).json({ message: "Invalid Refresh Token" });
   }
 };
 
-export const validateRefreshToken = async (token, userEmail) => {
+export const validateRefreshToken = async (req, res) => {
+  const { refreshToken } = req.cookies; // Access from cookies directly
+
+  if (!refreshToken) {
+    return res.status(401).json({ isValid: false, message: "No refresh token provided." });
+  }
+
   try {
     const refreshTokenDoc = await RefreshToken.findOne({
-      token: token,
-      expires: { $gt: new Date() }, // Ensure the token hasn't expired
+      token: refreshToken,
+      expires: { $gt: new Date() } // Ensure the token hasn't expired
     }).populate('user');
 
     if (!refreshTokenDoc || !refreshTokenDoc.user) {
       console.error("Refresh token not found or no associated user.");
-      return { isValid: false, user: null };
+      return res.status(403).json({ isValid: false, message: "Invalid token or user." });
     }
 
-    // Additional validation step: check if the user's email matches the expected email.
-    if (refreshTokenDoc.user.email !== userEmail) {
+    // Additional validation can still check user details like email
+    // Assuming the request also sends a user detail to validate against, e.g., in headers or body
+    if (refreshTokenDoc.user.email !== req.body.userEmail) {
       console.error("User details do not match.");
-      return { isValid: false, user: null };
+      return res.status(403).json({ isValid: false, message: "User details do not match." });
     }
 
     // The token and user details are valid
-    return { isValid: true, user: refreshTokenDoc.user };
+    res.json({ isValid: true, user: refreshTokenDoc.user });
   } catch (error) {
     console.error("Token validation error:", error);
-    return { isValid: false, user: null };
+    return res.status(500).json({ isValid: false, message: "Error validating token." });
   }
+
 };
 

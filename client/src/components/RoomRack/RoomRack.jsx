@@ -38,14 +38,9 @@
 
     const handleHousekeepingChange = async (id, newHousekeeping) => {
       try {
-        const token = localStorage.getItem("token"); // get the token from local storage
-        const config = {
-          headers: { Authorization: token }, // pass the token as a header
-        };
         const response = await axios.put(
           `http://localhost:5001/api/room-rack/${id}`,
-          { housekeeping: newHousekeeping },
-          config
+          { housekeeping: newHousekeeping }
         );
         const updatedRoom = response.data.room;
         setRooms((prevRooms) =>
@@ -55,7 +50,7 @@
         console.log(error);
       }
     };
-
+    
     return (
       <Box m="1.5rem 2.5rem">
         <Typography variant="h3" sx={{ marginTop: "1rem", marginBottom: "1rem" }}>
