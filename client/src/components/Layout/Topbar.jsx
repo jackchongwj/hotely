@@ -11,7 +11,8 @@ import FlexBetween from "components/Layout/FlexBetween";
 import { useDispatch } from "react-redux";
 import { setMode } from "state";
 import axios from "axios";
-
+import { useAuth } from "context/authContext";
+import { useNavigate } from 'react-router-dom';
 import {
   AppBar,
   Button,
@@ -26,8 +27,10 @@ import {
 } from "@mui/material";
 
 const Topbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
+  const { setIsAuthenticated } = useAuth();
   const dispatch = useDispatch();
   const theme = useTheme();
+  const navigate = useNavigate();
 
   const user = JSON.parse(localStorage.getItem("user"))
 
@@ -43,7 +46,8 @@ const Topbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
     try {
       // The endpoint should clear the cookies
       await axios.post('http://localhost:5001/auth/logout');
-      window.location.href = "/login"; // redirect to login page
+      navigate('/login', { replace: true });
+      setIsAuthenticated(false);
     } catch (error) {
       console.error('Error during logout:', error);
     }

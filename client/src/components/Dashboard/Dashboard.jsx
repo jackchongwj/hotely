@@ -67,7 +67,6 @@ const Dashboard = () => {
       <Box m="1.5rem 2.5rem">
         <FlexBetween>
           <Header title="CASA HOTEL" />
-
           <Box>
             <Button
               sx={{
@@ -83,40 +82,66 @@ const Dashboard = () => {
             </Button>
           </Box>
         </FlexBetween>
-
+  
         <Box
           mt="20px"
           display="grid"
           gridTemplateColumns="repeat(12, 1fr)"
-          gridAutoRows="160px"
+          gridTemplateRows="auto auto"  // Define rows for better control over height
+          gridAutoRows="minmax(100px, auto)"  // Controls the minimum and natural height of the rows not explicitly set
           gap="20px"
           sx={{
-            "& > div": {
-              gridColumn: isNonMediumScreens ? undefined : "span 12",
+            "@media (max-width: 600px)": {  // Adjustments for small screens
+              gridTemplateColumns: "repeat(2, 1fr)",  // 2x2 layout for stat boxes
+            },
+            "@media (min-width: 601px)": {  // Adjustments for medium and large screens
+              gridTemplateColumns: "repeat(8, 1fr) 4fr",  // 8 columns for stat boxes and revenue, 4 for occupancy
             },
           }}
         >
-          {/* ROW 1 */}
-          <StatBox title="Current Occupancy" value="75" />
-          <StatBox title="Current Guests" value="122" />
-
-          <StatBox title="Expected Arrival" value="24" />
-          <StatBox title="Expected Departure" value="32" />
-          <Box sx={{ gridColumn: "span 4" }}>
+          {/* StatBoxes (1x1 each on large screens, 2x2 on small) */}
+          <StatBox title="Current Occupancy" value="75" sx={{ gridColumn: "span 2" }} />
+          <StatBox title="Current Guests" value="122" sx={{ gridColumn: "span 2" }} />
+          <StatBox title="Expected Arrival" value="24" sx={{ gridColumn: "span 2" }} />
+          <StatBox title="Expected Departure" value="32" sx={{ gridColumn: "span 2" }} />
+  
+          {/* Revenue Chart */}
+          <Box
+            sx={{
+              gridColumn: "1 / 9",  // Spans all columns under the stat boxes on large screens
+              gridRow: "2",         // Ensure it's on the second row
+              "@media (max-width: 600px)": {
+                gridColumn: "1 / 3",  // Spans full width under stat boxes on small screens
+                gridRow: "3",         // Changes to third row on small screens
+              },
+            }}
+          >
+            <Report revenueData={revenueData} sx={{ width: '100%', height: 'auto' }} />
+          </Box>
+  
+          {/* Occupancy Chart */}
+          <Box
+            sx={{
+              gridColumn: "9 / 13",  // Positioned to the right side across from the stat boxes and revenue chart on large screens
+              gridRow: "1 / 3",      // Spans from the first to the second row, vertically aligned with stat and revenue boxes
+              "@media (max-width: 600px)": {
+                gridColumn: "1 / 3",  // Stacks under the revenue chart on small screens
+                gridRow: "4",         // Positioned below revenue chart on small screens
+              },
+            }}
+          >
             <Charts
               occupancyData={occupancyData}
               reservationsData={reservationsData}
               roomsData={roomsData}
+              sx={{ width: '100%', height: 'auto' }}
             />
-          </Box>
-
-          <Box sx={{ gridColumn: "span 8" }}>
-            <Report revenueData={revenueData} />
           </Box>
         </Box>
       </Box>
     </>
   );
+  
 };
 
 export default Dashboard;

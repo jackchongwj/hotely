@@ -30,7 +30,7 @@ export const cancelReservation = async (req, res) => {
       res.status(404).json({ message: "Reservation not found" });
       return;
     }
-    res.status(200).json({ message: "Reservation cancelled successfully", reservation });
+    res.status(200).json({ message: "Reservation cancelled successfully" });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }

@@ -30,7 +30,7 @@ app.use(cookieParser())
 
 // Define CORS options
 const corsOptions = {
-  origin: 'http://localhost:3000', // or the client's origin in production
+  origin: 'http://localhost:3000',
   credentials: true,
 };
 

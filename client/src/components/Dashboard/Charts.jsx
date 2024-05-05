@@ -7,7 +7,7 @@ const Charts = ({ occupancyData, reservationsData, roomsData }) => {
   const theme = useTheme();
 
   // Colors to use for the pie charts
-const colors = ["red", "green", "blue", "yellow", "grey"];
+const colors = ["#ff9425", "#e56a54", "#bbdde6", "#fdd26e", "#af272f"];
 
   return (
     <Box

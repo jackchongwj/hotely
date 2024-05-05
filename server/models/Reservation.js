@@ -15,7 +15,7 @@ const reservationSchema = new mongoose.Schema({
   },
   numChildren: {
     type: Number,
-    required: true,
+    required: false,
   },
   daysOfStay: {
     type: Number,
@@ -37,19 +37,22 @@ const reservationSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  checkedIn: {
-    type: Boolean,
-    required: true,
-  },
-  checkedOut: {
-    type: Boolean,
-    required: true,
-  },
-
   bookingChannel: {
     type: String,
     required: true,
   },
+  checkedIn: {
+    type: Boolean,
+    default: false,
+  },
+  checkedOut: {
+    type: Boolean,
+    default: false,
+  },
+  cancelled: {
+    type: Boolean,
+    default: false,
+  }
 });
 
 reservationSchema.statics.cancelById = async function (id, update, options) {

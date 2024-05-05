@@ -2,33 +2,42 @@ import jwt from "jsonwebtoken";
 import { validationResult } from "express-validator";
 import User from "../models/User.js";
 import { errorHandler } from "../helpers/error.handler.js";
+import { verifyAccessToken, validateAndRefreshToken, setAccessTokenCookie } from '../services/auth.service.js';
 
 export const requireAuth = async (req, res, next) => {
-  console.log(req.cookies)
-  const token = req.cookies['accessToken'];
-  if (!token) {
-    return res.status(401).json({ error: "No token provided" });
-  }
+    const { accessToken, refreshToken } = req.cookies;
+    const isProduction = process.env.NODE_ENV === "production";
 
-  try {
-    // Decode the token
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-
-    // Fetch the user by ID from the decoded token
-    const user = await User.findById(decodedToken.id);
-
-    // If user does not exist or email does not match
-    if (!user || user.email !== decodedToken.email) {
-      return res.status(401).json({ error: "Authentication failed" });
+    if (accessToken) {
+        try {
+            const decodedToken = verifyAccessToken(accessToken);
+            req.user = await findAndValidateUser(decodedToken.id, decodedToken.email);
+            return next();
+        } catch (error) {
+            if (!refreshToken) {
+                res.clearCookie('accessToken');
+                res.clearCookie('refreshToken');
+                return res.status(401).json({ error: "Authentication required, please log in." });
+            }
+        }
     }
 
-    // Attach user to the request object
-    req.user = { id: user._id, email: user.email };
-    next();
-  } catch (err) {
-    return res.status(401).json({ error: "Authentication failed" });
-  }
+    if (refreshToken) {
+        try {
+            const { newAccessToken, user } = await validateAndRefreshToken(refreshToken, isProduction);
+            setAccessTokenCookie(res, newAccessToken, isProduction);
+            req.user = { id: user._id, email: user.email };
+            return next();
+        } catch (error) {
+            res.clearCookie('accessToken');
+            res.clearCookie('refreshToken');
+            return res.status(401).json({ error: error.message });
+        }
+    } else {
+        return res.status(401).json({ error: "Authentication required, please log in." });
+    }
 };
+
 
 export const validateRegister = async (req, res, next) => {
   const errors = validationResult(req);

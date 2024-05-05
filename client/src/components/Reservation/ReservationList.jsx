@@ -8,7 +8,7 @@ const ReservationList = () => {
   const [selectedRow, setSelectedRow] = useState(null);
   const [rows, setRows] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const rowsWithIndex = rows.map((row, index) => ({ ...row, id: index + 1 }));
+  const rowsWithIndex = rows.map((row, index) => ({ ...row, id: row._id }));
 
   const columns = [
     { field: "id", headerName: "#", width: 90 },
@@ -33,7 +33,6 @@ const ReservationList = () => {
         const response = await axios.get("http://localhost:5001/api/reservation-list", {
           withCredentials: true, 
         });
-        console.log(response);
         const filteredReservations = response.data.reservations.filter(
           (reservation) => !reservation.cancelled
         );
@@ -48,7 +47,7 @@ const ReservationList = () => {
   
 
   const handleRowClick = (params) => {
-    setSelectedRow(params.id);
+    setSelectedRow(params.row._id);
   };
 
   const createReservation = async (reservation) => {
@@ -64,12 +63,16 @@ const ReservationList = () => {
   };
 
   const cancelReservation = async (id) => {
+    console.log("Attempting to cancel reservation with ID:", id);
     try {
-      await axios.put(`http://localhost:5001/api/reservation-list/${id}`);
-      setRows(rows.filter((row) => row.id !== id));
-    } catch (error) {
-      console.log(error);
-    }
+      const response = await axios.put(`http://localhost:5001/api/reservation-list/${id}`);
+      console.log("Reservation cancelled successfully:", response.data);
+      if (response.status === 200) {
+          setRows(rows.filter((row) => row._id !== id));
+      }
+  } catch (error) {
+      console.log("Error cancelling reservation:", error);
+  }
   };
 
   return (
@@ -104,7 +107,7 @@ const ReservationList = () => {
           <Button
             variant="contained"
             color="primary"
-            onClick={cancelReservation}
+            onClick={() => selectedRow && cancelReservation(selectedRow)} // Pass the selectedRow as ID
           >
             Delete Reservation
           </Button>
