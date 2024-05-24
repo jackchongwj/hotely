@@ -1,32 +1,26 @@
-import express from 'express'
-import bodyParser from 'body-parser'
-import mongoose from 'mongoose'
-import cors from 'cors'
-import dotenv from 'dotenv'
-import helmet from 'helmet'
-import morgan from 'morgan'
-import cookieParser from 'cookie-parser'
-
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import helmet from 'helmet';
+import morgan from 'morgan';
+import cookieParser from 'cookie-parser';
 import { Server } from 'socket.io';
+import connectDB from './config/db.js';
 
 // Import routes
-import authRoutes from './routes/auth.routes.js'
-import clientRoutes from './routes/client.routes.js'
-import chatRoutes from './routes/chat.routes.js'
-import userRoutes from './routes/user.routes.js'
+import authRoutes from './routes/auth.routes.js';
+import clientRoutes from './routes/client.routes.js';
 
 // Load environment variables
-dotenv.config()
+dotenv.config();
 
 // Set up Express app
-const app = express()
-app.use(express.json())
-app.use(helmet())
-app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }))
-app.use(morgan('common'))
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: false }))
-app.use(cookieParser())
+const app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(helmet());
+app.use(morgan('common'));
 
 // Define CORS options
 const corsOptions = {
@@ -38,8 +32,8 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // Set up routes
-app.use('/auth', authRoutes)
-app.use('/api', clientRoutes)
+app.use('/auth', authRoutes);
+app.use('/api', clientRoutes);
 
 // Example of logging middleware
 app.use((req, res, next) => {
@@ -48,22 +42,19 @@ app.use((req, res, next) => {
 });
 
 // Set up MongoDB database connection and start server
-const PORT = process.env.PORT || 9000
-mongoose
-  .connect(process.env.MONGO_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => {
-    const server = app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
-    const io = new Server(server, {
-      pingTimeout: 60000,
-      cors: {
-        origin: "http://localhost:3000", 
-      },
-    });
-    io.on('connection', (socket) => {
-      console.log("connected to socket.io")
-    })
-  })
-  .catch((error) => console.log(`${error} did not connect`))
+const PORT = process.env.PORT || 9000;
+
+// Connect to MongoDB and start the server
+connectDB().then(() => {
+  const server = app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+  const io = new Server(server, {
+    pingTimeout: 60000,
+    cors: { origin: "http://localhost:3000" },
+  });
+
+  io.on('connection', (socket) => {
+    console.log("Connected to socket.io");
+  });
+}).catch(error => {
+  console.error('Failed to start the server:', error);
+});

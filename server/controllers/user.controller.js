@@ -1,35 +1,5 @@
 import User from "../models/User.js";
 
-export const createUser = async (req, res) => {
-  try {
-    const { fname, lname, email, password } = req.body;
-
-    // Create a new user object
-    const user = new User({
-      fname,
-      lname,
-      email,
-      password,
-    });
-
-    // Save the user to the database
-    await user.save();
-
-    // Save a reference to the refresh token
-    await User.updateOne(
-      { _id: user._id, "refreshTokens.token": refreshToken },
-      { "$set": { "refreshTokens.$.expires": new Date(new Date().getTime() + (7 * 24 * 60 * 60 * 1000)) } } // 7 days from now
-    );
-    // Return the newly created user object
-    res.status(201).json({
-      user,
-      message: "User created successfully",
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
-
 export const getUser = async (req, res) => {
   try {
     // Use the user ID from the JWT, added by the auth middleware
@@ -48,6 +18,7 @@ export const getUser = async (req, res) => {
         fname: user.fname,
         lname: user.lname,
         email: user.email,
+        role: user.role,
       },
     });
   } catch (err) {
@@ -69,6 +40,7 @@ export const updateUser = async (req, res) => {
         lname,
         email,
         password,
+        role,
       },
       { new: true } // return the updated user object
     );

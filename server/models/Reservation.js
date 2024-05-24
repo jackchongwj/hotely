@@ -17,14 +17,6 @@ const reservationSchema = new mongoose.Schema({
     type: Number,
     required: false,
   },
-  daysOfStay: {
-    type: Number,
-    required: true,
-  },
-  roomType: {
-    type: String,
-    required: true,
-  },
   arrivalDate: {
     type: Date,
     required: true,
@@ -32,6 +24,18 @@ const reservationSchema = new mongoose.Schema({
   departureDate: {
     type: Date,
     required: true,
+  },
+  daysOfStay: {
+    type: Number,
+    required: true,
+  },
+  roomType: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "RoomDetail", 
+  },
+  price: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: "RoomDetail" 
   },
   leadTime: {
     type: Number,
@@ -52,14 +56,14 @@ const reservationSchema = new mongoose.Schema({
   cancelled: {
     type: Boolean,
     default: false,
-  }
+  },
 });
 
-reservationSchema.statics.cancelById = async function (id, update, options) {
-    const reservation = await this.findByIdAndUpdate(id, update, options);
-    return reservation;
-  };
-  
-const Reservations = mongoose.model('Reservations', reservationSchema);
+reservationSchema.statics.cancelById = async function (id) {
+  const reservation = await this.findByIdAndUpdate(id, { cancelled: true }, { new: true });
+  return reservation;
+};
+
+const Reservations = mongoose.model("Reservations", reservationSchema);
 
 export default Reservations;

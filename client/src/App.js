@@ -14,6 +14,7 @@ import RoomRack from "components/RoomRack/RoomRack";
 import Guests from "components/Guests/Guests";
 import Inventory from "components/Inventory/Inventory";
 import Chat from "components/Chat/Chat";
+import RoomSettings from "components/RoomSettings/RoomSettings";
 import Login from "components/Auth/Login";
 import Register from "components/Auth/Register";
 
@@ -48,6 +49,7 @@ function App() {
                   <Route path="/room-rack" element={<ProtectedRoute><RoomRack /></ProtectedRoute>} />
                   <Route path="/guests" element={<ProtectedRoute><Guests /></ProtectedRoute>} />
                   <Route path="/inventory" element={<ProtectedRoute><Inventory /></ProtectedRoute>} />
+                  <Route path="/room-settings" element={<ProtectedRoute><RoomSettings /></ProtectedRoute>} />
                 </Route>
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>

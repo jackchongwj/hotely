@@ -1,6 +1,6 @@
 import Rooms from "../models/Room.js";
 
-// Get all rooms
+// GET /api/room-rack
 export const getAllRooms = async (req, res) => {
   try {
     const rooms = await Rooms.find();
@@ -10,7 +10,7 @@ export const getAllRooms = async (req, res) => {
   }
 };
 
-// Create a new room
+// POST /api/room-rack
 export const createRoom = async (req, res) => {
   try {
     const existingRoom = await Rooms.findOne({ number: req.body.roomNumber });
@@ -25,6 +25,7 @@ export const createRoom = async (req, res) => {
   }
 };
 
+// PUT /api/room-rack
 export const updateRoom = async (req, res) => {
   try {
     const { id } = req.params;
@@ -43,7 +44,7 @@ export const updateRoom = async (req, res) => {
   }
 };
 
-// Delete a room
+// DELETE /api/room-rack
 export const deleteRoom = async (req, res) => {
   try {
     const { id } = req.params;
@@ -57,3 +58,4 @@ export const deleteRoom = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+

@@ -12,6 +12,7 @@ import { useDispatch } from "react-redux";
 import { setMode } from "state";
 import axios from "axios";
 import { useAuth } from "context/authContext";
+import { useUser } from "context/userContext";
 import { useNavigate } from 'react-router-dom';
 import {
   AppBar,
@@ -23,6 +24,10 @@ import {
   Toolbar,
   Menu,
   MenuItem,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
   useTheme,
 } from "@mui/material";
 
@@ -32,16 +37,22 @@ const Topbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
   const theme = useTheme();
   const navigate = useNavigate();
 
-  const user = JSON.parse(localStorage.getItem("user"))
+  const { user } = useUser();
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [anchorEl1, setAnchorEl1] = useState(null);
+  const [isProfileDialogOpen, setIsProfileDialogOpen] = useState(false);
+  const [isRoomSettingsDialogOpen, setIsRoomSettingsDialogOpen] = useState(false);
+
   const isOpen = Boolean(anchorEl);
   const isOpen1 = Boolean(anchorEl1);
+
   const handleClick = (event) => setAnchorEl(event.currentTarget);
-  const handleClick1 = (event) => setAnchorEl1(event.currentTarget);
   const handleClose = () => setAnchorEl(null);
+  
+  const handleClick1 = (event) => setAnchorEl1(event.currentTarget);
   const handleClose1 = () => setAnchorEl1(null);
+  
   const handleLogout = async () => {
     try {
       // The endpoint should clear the cookies
@@ -51,6 +62,13 @@ const Topbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
     } catch (error) {
       console.error('Error during logout:', error);
     }
+  };
+
+  const handleOpenProfileDialog = () => setIsProfileDialogOpen(true);
+  const handleCloseProfileDialog = () => setIsProfileDialogOpen(false);
+
+  const handleNavigateToRoomSettings = () => {
+    navigate('/room-settings');
   };
 
   return (
@@ -90,8 +108,11 @@ const Topbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
               onClose={handleClose1}
               anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
             >
-              <MenuItem onClick={handleClose1}>View Profile</MenuItem>
-              <MenuItem onClick={handleClose1}>All Users</MenuItem>
+              <MenuItem onClick={handleOpenProfileDialog}>View Profile</MenuItem>
+              <MenuItem onClick={handleClose}>All Users</MenuItem>
+              {user && user.role === "Administrator" && (
+                <MenuItem onClick={handleNavigateToRoomSettings}>Room Settings</MenuItem>
+              )}
             </Menu>
           </FlexBetween>
           <FlexBetween>
@@ -136,6 +157,18 @@ const Topbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
           </FlexBetween>
         </FlexBetween>
       </Toolbar>
+
+      {/* Profile Dialog */}
+      <Dialog open={isProfileDialogOpen} onClose={handleCloseProfileDialog}>
+        <DialogTitle>Profile</DialogTitle>
+        <DialogContent>
+          {/* Add profile content here */}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseProfileDialog}>Close</Button>
+        </DialogActions>
+      </Dialog>
+
     </AppBar>
   );
 };

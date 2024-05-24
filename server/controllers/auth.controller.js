@@ -17,7 +17,7 @@ export const register = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const newUser = new User({ fname, lname, email, password: hashedPassword });
+    const newUser = new User({ fname, lname, email, role: 'User', password: hashedPassword });
     await newUser.save();
 
     res.status(201).json({ message: "User registered successfully.", status: "ok" });
@@ -41,7 +41,7 @@ export const login = async (req, res) => {
 
     res.status(200).json({
       message: "Logged in successfully",
-      user: { fname: user.fname, lname: user.lname, email: user.email },
+      user: { fname: user.fname, lname: user.lname, email: user.email, role: user.role },
     });
   } catch (error) {
     errorHandler(res, error, req);

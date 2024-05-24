@@ -8,16 +8,16 @@ const ReservationList = () => {
   const [selectedRow, setSelectedRow] = useState(null);
   const [rows, setRows] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const rowsWithIndex = rows.map((row, index) => ({ ...row, id: row._id }));
+  const rowsWithIndex = rows.map((row, index) => ({ ...row, id: index + 1 }));
 
   const columns = [
-    { field: "id", headerName: "#", width: 90 },
-    { field: "reservationId", headerName: "Reservation ID", width: 150 },
-    { field: "customerId", headerName: "Customer ID", width: 150 },
-    { field: "numAdults", headerName: "Adults", width: 90 },
-    { field: "numChildren", headerName: "Children", width: 90 },
-    { field: "daysOfStay", headerName: "Days of Stay", width: 90 },
-    { field: "roomType", headerName: "Room Type", width: 120 },
+    { field: "id", headerName: "#", width: 50 },
+    { field: "reservationId", headerName: "Reservation ID", width: 100 },
+    { field: "customerId", headerName: "Customer ID", width: 120 },
+    { field: "numAdults", headerName: "Adults", width: 80 },
+    { field: "numChildren", headerName: "Children", width: 80 },
+    { field: "daysOfStay", headerName: "Days of Stay", width: 80 },
+    { field: "roomType", headerName: "Room Type", width: 120, valueGetter: (params) => params.row.roomType.name },
     { field: "arrivalDate", headerName: "Arrival Date", width: 120 },
     { field: "departureDate", headerName: "Departure Date", width: 120 },
     { field: "leadTime", headerName: "Lead Time", width: 90 },
@@ -36,7 +36,7 @@ const ReservationList = () => {
         const filteredReservations = response.data.reservations.filter(
           (reservation) => !reservation.cancelled
         );
-  
+          console.log(filteredReservations)
         setRows(filteredReservations);
       } catch (error) {
         console.error('Error fetching reservations:', error);
@@ -48,6 +48,33 @@ const ReservationList = () => {
 
   const handleRowClick = (params) => {
     setSelectedRow(params.row._id);
+    console.log('Selected row ID:', params.row._id); // Add this line for debugging
+  };
+
+  const handleCheckIn = async (id) => {
+    try {
+      setRows(rows.map((row) => row._id === id ? { ...row, checkedIn: true } : row));
+      const response = await axios.put(`http://localhost:5001/api/reservation-list/${id}/check-in`);
+      if (response.status !== 200) {
+        throw new Error('Error checking in');
+      }
+    } catch (error) {
+      setRows(rows.map((row) => row._id === id ? { ...row, checkedIn: false } : row));
+      console.log("Error checking in reservation:", error);
+    }
+  };
+
+  const handleCheckOut = async (id) => {
+    try {
+      setRows(rows.map((row) => row._id === id ? { ...row, checkedOut: true } : row));
+      const response = await axios.put(`http://localhost:5001/api/reservation-list/${id}/check-out`);
+      if (response.status !== 200) {
+        throw new Error('Error checking out');
+      }
+    } catch (error) {
+      setRows(rows.map((row) => row._id === id ? { ...row, checkedOut: false } : row));
+      console.log("Error checking out reservation:", error);
+    }
   };
 
   const createReservation = async (reservation) => {
@@ -55,11 +82,12 @@ const ReservationList = () => {
       const response = await axios.post(
         "http://localhost:5001/api/reservation-list", reservation
       );
-      setRows([...rows, response.data]);
+      setRows([...rows, response.data.reservation]);
+      setDialogOpen(false);
     } catch (error) {
-      console.log(error);
+      console.error('Error occurred:', error.response ? error.response.data : error.message);
+      setDialogOpen(false);
     }
-    setDialogOpen(false);
   };
 
   const cancelReservation = async (id) => {
@@ -82,10 +110,19 @@ const ReservationList = () => {
       </Typography>
       <Box display="flex" justifyContent="space-between" mb={2}>
         <Box display="flex">
-          <Button variant="contained" color="primary" sx={{ mr: 2 }}>
+          <Button
+            variant="contained"
+            color="primary"
+            sx={{ mr: 2 }}
+            onClick={() => selectedRow && handleCheckIn(selectedRow)}
+          >
             Check-in
           </Button>
-          <Button variant="contained" color="primary">
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => selectedRow && handleCheckOut(selectedRow)}
+          >
             Check-out
           </Button>
         </Box>

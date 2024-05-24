@@ -1,10 +1,8 @@
 import express from "express";
-import { createUser, deleteUser, getUser, updateUser } from "../controllers/user.controller.js";
+import { deleteUser, getUser, updateUser } from "../controllers/user.controller.js";
 import { requireAuth } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
-
-router.post("/user", createUser);
 
 router.get("/user/:id", requireAuth, getUser);
 

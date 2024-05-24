@@ -19,6 +19,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         minimum: 5,
         required: [true, 'Please add password']
+    },
+    role: {
+        type: String,
+        required: [true, 'Please add user role']
     }
 },
 {

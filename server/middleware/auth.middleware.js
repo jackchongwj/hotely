@@ -11,7 +11,8 @@ export const requireAuth = async (req, res, next) => {
     if (accessToken) {
         try {
             const decodedToken = verifyAccessToken(accessToken);
-            req.user = await findAndValidateUser(decodedToken.id, decodedToken.email);
+            const user = await findAndValidateUser(decodedToken.id, decodedToken.email);
+            req.user = { id: user._id, email: user.email, role: user.role };
             return next();
         } catch (error) {
             if (!refreshToken) {
@@ -26,7 +27,7 @@ export const requireAuth = async (req, res, next) => {
         try {
             const { newAccessToken, user } = await validateAndRefreshToken(refreshToken, isProduction);
             setAccessTokenCookie(res, newAccessToken, isProduction);
-            req.user = { id: user._id, email: user.email };
+            req.user = { id: user._id, email: user.email, role: user.role };
             return next();
         } catch (error) {
             res.clearCookie('accessToken');
@@ -38,6 +39,16 @@ export const requireAuth = async (req, res, next) => {
     }
 };
 
+export const requireAdminAuth = async (req, res, next) => {
+    await requireAuth(req, res, async () => {
+        console.log(req.user.role)
+        if (req.user && req.user.role === 'Administrator') {
+            return next();
+        } else {
+            return res.status(403).json({ error: "Admin access required." });
+        }
+    });
+};
 
 export const validateRegister = async (req, res, next) => {
   const errors = validationResult(req);

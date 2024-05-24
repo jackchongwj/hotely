@@ -17,7 +17,7 @@ import {
 } from "@mui/material";
 import Charts from "components/Dashboard/Charts";
 import StatBox from "components/Layout/StatBox";
-import Report from "components/Report/Report";
+import Report from "components/Dashboard/Report";
 
 const Dashboard = () => {
   const theme = useTheme();
