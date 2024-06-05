@@ -3,6 +3,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import { Box, Typography, Button, Dialog } from "@mui/material";
 import axios from "axios";
 import AddReservationDialog from "./AddReservationDialog";
+import { format } from "date-fns";
 
 const ReservationList = () => {
   const [selectedRow, setSelectedRow] = useState(null);
@@ -15,16 +16,17 @@ const ReservationList = () => {
     { field: "reservationId", headerName: "Reservation ID", width: 100 },
     { field: "customerId", headerName: "Customer ID", width: 120 },
     { field: "numAdults", headerName: "Adults", width: 80 },
-    { field: "numChildren", headerName: "Children", width: 80 },
+    { field: "numChildren", headerName: "Children", width: 90, valueGetter: (params) => params.row.numChildren ?? 0 },
     { field: "daysOfStay", headerName: "Days of Stay", width: 80 },
     { field: "roomType", headerName: "Room Type", width: 120, valueGetter: (params) => params.row.roomType.name },
-    { field: "arrivalDate", headerName: "Arrival Date", width: 120 },
-    { field: "departureDate", headerName: "Departure Date", width: 120 },
+    { field: "arrivalDate", headerName: "Arrival Date", width: 120, valueGetter: (params) => format(new Date(params.row.arrivalDate), 'yyyy-MM-dd') },
+    { field: "departureDate", headerName: "Departure Date", width: 120, valueGetter: (params) => format(new Date(params.row.departureDate), 'yyyy-MM-dd') },
     { field: "leadTime", headerName: "Lead Time", width: 90 },
     { field: "checkedIn", headerName: "Checked In", width: 90 },
     { field: "checkedOut", headerName: "Checked Out", width: 90 },
     { field: "bookingChannel", headerName: "Booking Channel", width: 150 },
     { field: "cancelled", headerName: "Cancelled", width: 90 },
+    { field: "totalPrice", headerName: "Total Price", width: 150, valueGetter: (params) => params.row.roomType.price * params.row.daysOfStay },
   ];
 
   useEffect(() => {
@@ -33,11 +35,7 @@ const ReservationList = () => {
         const response = await axios.get("http://localhost:5001/api/reservation-list", {
           withCredentials: true, 
         });
-        const filteredReservations = response.data.reservations.filter(
-          (reservation) => !reservation.cancelled
-        );
-          console.log(filteredReservations)
-        setRows(filteredReservations);
+        setRows(response.data.reservations);
       } catch (error) {
         console.error('Error fetching reservations:', error);
       }
@@ -146,7 +144,7 @@ const ReservationList = () => {
             color="primary"
             onClick={() => selectedRow && cancelReservation(selectedRow)} // Pass the selectedRow as ID
           >
-            Delete Reservation
+            Cancel Reservation
           </Button>
         </Box>
       </Box>

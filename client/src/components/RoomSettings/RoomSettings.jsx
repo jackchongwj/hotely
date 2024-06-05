@@ -3,11 +3,15 @@ import { DataGrid } from "@mui/x-data-grid";
 import { Box, Typography, Button, Dialog } from "@mui/material";
 import axios from "axios";
 import AddRoomDialog from "./AddRoomTypeDialog";
+import EditRoomDialog from "./EditRoomDialog"; // Import the EditRoomDialog component
 
 const RoomSettings = () => {
   const [selectedRow, setSelectedRow] = useState(null);
   const [roomTypes, setRoomTypes] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [roomTypeToEdit, setRoomTypeToEdit] = useState(null);
+
   const roomTypesWithIndex = roomTypes.map((roomType, index) => ({ ...roomType, id: index + 1 }));
 
   const columns = [
@@ -36,11 +40,26 @@ const RoomSettings = () => {
   const addRoomType = async (roomType) => {
     try {
       const response = await axios.post("http://localhost:5001/api/room-detail", roomType);
-      setRoomTypes([...roomTypes, response.data]);
+      setRoomTypes([...roomTypes, response.data.roomDetail]);
     } catch (error) {
       console.error("Error adding room type:", error);
     }
     setDialogOpen(false);
+  };
+
+  const editRoomType = (roomType) => {
+    setRoomTypeToEdit(roomType);
+    setEditDialogOpen(true);
+  };
+
+  const updateRoomType = async (updatedRoomType) => {
+    try {
+      const response = await axios.put(`http://localhost:5001/api/room-detail/${updatedRoomType._id}`, updatedRoomType);
+      setRoomTypes(roomTypes.map(room => (room._id === updatedRoomType._id ? response.data.roomDetail : room)));
+    } catch (error) {
+      console.error("Error updating room type:", error);
+    }
+    setEditDialogOpen(false);
   };
 
   const deleteRoomType = async (id) => {
@@ -60,10 +79,19 @@ const RoomSettings = () => {
       </Typography>
       <Box display="flex" justifyContent="space-between" mb={2}>
         <Box display="flex">
-          <Button variant="contained" color="primary" sx={{ mr: 2 }}>
+          <Button 
+            variant="contained" 
+            color="primary" 
+            sx={{ mr: 2 }} 
+            onClick={() => selectedRow && editRoomType(roomTypes.find(room => room._id === selectedRow))}
+          >
             Edit
           </Button>
-          <Button variant="contained" color="primary">
+          <Button 
+            variant="contained" 
+            color="primary" 
+            onClick={() => selectedRow && deleteRoomType(selectedRow)}
+          >
             Delete
           </Button>
         </Box>
@@ -82,13 +110,15 @@ const RoomSettings = () => {
               onCancel={() => setDialogOpen(false)}
             />
           </Dialog>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => selectedRow && deleteRoomType(selectedRow)} // Pass the selectedRow as ID
-          >
-            Delete Room Type
-          </Button>
+          <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)}>
+            {roomTypeToEdit && (
+              <EditRoomDialog
+                roomType={roomTypeToEdit}
+                onSubmit={updateRoomType}
+                onCancel={() => setEditDialogOpen(false)}
+              />
+            )}
+          </Dialog>
         </Box>
       </Box>
       <DataGrid

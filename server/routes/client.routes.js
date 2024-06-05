@@ -15,7 +15,7 @@ router.get('/inventory', requireAuth, dashboard);
 // Reservation routes
 router.get('/reservation-list', requireAuth, getAllReservations);
 router.post('/reservation-list', requireAuth, createReservation);
-router.delete('/reservation-list/:id', requireAuth, cancelReservation);
+router.put('/reservation-list/:id', requireAuth, cancelReservation);
 router.put('/reservation-list/:id/check-in', requireAuth, checkInReservation);
 router.put('/reservation-list/:id/check-out', requireAuth, checkOutReservation);
 

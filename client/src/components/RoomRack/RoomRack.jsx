@@ -12,23 +12,26 @@
     Typography,
     IconButton,
     useTheme,
-    Button,
-    Dialog,
+    Menu,
+    MenuItem as MenuOption,
   } from "@mui/material";
   import { AddCircle } from "@mui/icons-material";
 
 
   const RoomRack = () => {
     const theme = useTheme();
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [selectedRoom, setSelectedRoom] = useState(null);
     const [rooms, setRooms] = useState([]);
-
+  
     useEffect(() => {
       const fetchRooms = async () => {
         try {
           const response = await axios.get("http://localhost:5001/api/room-rack", {
-            withCredentials: true, 
+            withCredentials: true,
           });
-          setRooms(response.data.rooms);
+          const sortedRooms = response.data.rooms.sort((a, b) => a.roomNumber - b.roomNumber);
+          setRooms(sortedRooms);
         } catch (error) {
           console.error('Error fetching rooms:', error);
         }
@@ -51,6 +54,21 @@
       }
     };
     
+    const handleMenuOpen = (event, room) => {
+      setAnchorEl(event.currentTarget);
+      setSelectedRoom(room);
+    };
+  
+    const handleMenuClose = () => {
+      setAnchorEl(null);
+      setSelectedRoom(null);
+    };
+  
+    const handleMenuOptionClick = (option) => {
+      console.log(`Selected option ${option} for room ${selectedRoom.roomNumber}`);
+      handleMenuClose();
+    };
+
     return (
       <Box m="1.5rem 2.5rem">
         <Typography variant="h3" sx={{ marginTop: "1rem", marginBottom: "1rem" }}>
@@ -125,6 +143,7 @@
                 flexDirection: "column",
                 justifyContent: "center",
                 alignItems: "center",
+                backgroundColor: theme.palette.mode === "dark" ? "#36454F" : "#f5f5f5"
               }}
             >
               <CardContent sx={{ flexGrow: 1 }}>
@@ -181,14 +200,34 @@
                 justifyContent="flex-end"
                 sx={{ padding: "0.5rem" }}
               >
-                <IconButton>
-                  <AddCircle />
-                </IconButton>
-              </Box>
-            </Card>
-          ))}
-        </Box>
+                <IconButton onClick={(e) => handleMenuOpen(e, room)}>
+                <AddCircle />
+              </IconButton>
+            </Box>
+          </Card>
+        ))}
       </Box>
-    );
-  };
+
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
+      >
+        <MenuOption onClick={() => handleMenuOptionClick("assignTask")}>
+          Assign Task
+        </MenuOption>
+        <MenuOption onClick={() => handleMenuOptionClick("addNotes")}>
+          Add Notes
+        </MenuOption>
+        <MenuOption onClick={() => handleMenuOptionClick("viewDetails")}>
+          View Details
+        </MenuOption>
+        <MenuOption onClick={() => handleMenuOptionClick("changeStatus")}>
+          Change Status
+        </MenuOption>
+      </Menu>
+    </Box>
+  );
+};
+
   export default RoomRack;
