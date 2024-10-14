@@ -1,45 +1,34 @@
 // color design tokens export
 export const tokensDark = {
   grey: {
-    0: "#ffffff", // manually adjusted
-    10: "#f6f6f6", // manually adjusted
-    50: "#f0f0f0", // manually adjusted
+    0: "#fafafa", // light accent for dark mode
     100: "#e0e0e0",
-    200: "#c2c2c2",
-    300: "#a3a3a3",
-    400: "#C4C4C4",
-    500: "#8C8C8C",
-    600: "#535353",
-    700: "#3d3d3d",
-    800: "#292929",
-    900: "#141414",
-    1000: "#000000", // manually adjusted
+    200: "#ced4da",
+    300: "#adb5bd",
+    400: "#6c757d",
+    500: "#495057",
+    600: "#343a40",
+    700: "#22272B", // dark sidebar color
   },
   primary: {
-    // blue
-    100: "#1D77A5",
-    200: "#2495d3",
-    300: "#2db4ff",
-    400: "#16638F",
-    500: "#114a6a",
-    600: "#0c354E", // manually adjusted
-    700: "#141937",
-    800: "#052136",
+    100: "#a9e3ff",
+    200: "#86c1f3",
+    300: "#64a0d0",
+    400: "#4181af",
+    500: "#16638F", // dark mode main background
+    600: "#004973",
+    700: "#003e66", // deeper blue
   },
   secondary: {
     100: "#f7fcff",
-    200: "#eef9ff",
     300: "#e6f5ff",
-    400: "#ddf2ff",
-    500: "#d5efff",
+    500: "#FAFAFA", // accent color for dark mode (white)
     600: "#aabfcc",
     700: "#808f99",
     800: "#556066",
-    900: "#2b3033",
-  }
-}
+  },
+};
 
-// function that reverses the color palette
 function reverseTokens(tokensDark) {
   const reversedTokens = {};
   Object.entries(tokensDark).forEach(([key, val]) => {

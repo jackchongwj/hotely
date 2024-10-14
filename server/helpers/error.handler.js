@@ -1,19 +1,21 @@
+import mongoose from "mongoose";
 import ErrorLog from '../models/ErrorLog.js';
 
 export class ErrorHandler extends Error {
-  constructor(statusCode, message) {
+  constructor(statusCode = 500, message = "Internal Server Error") {
     super();
     this.statusCode = statusCode;
     this.message = message;
   }
 }
+
 const logErrorToDatabase = async (err, req) => {
   try {
     const errorLog = new ErrorLog({
-      statusCode: err.statusCode,
-      message: err.message,
-      path: req?.originalUrl, // Optional chaining in case req is not provided
-      // user: req?.user?.id, // Similarly, handle optional chaining for user info
+      statusCode: err.statusCode || 500,
+      message: err.message || "Internal Server Error",
+      path: req?.originalUrl || "Unknown path", // Provide default value
+      user: req?.user?.id || null, // Provide default value for user
     });
     await errorLog.save();
   } catch (dbError) {
@@ -28,8 +30,8 @@ export const errorHandler = async (res, err, req) => {
     // Proceed to respond to the client as before
     res.status(err.statusCode || 500).json({
       error: {
-        status: err.statusCode,
-        message: err.message,
+        status: err.statusCode || 500,
+        message: err.message || "Internal Server Error",
       },
     });
   } catch (error) {

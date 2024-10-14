@@ -1,9 +1,13 @@
 import Rooms from "../models/Room.js";
+import RoomDetail from "../models/RoomDetail.js";
+import Housekeeping from "../models/Housekeeping.js";
 
 // GET /api/room-rack
 export const getAllRooms = async (req, res) => {
   try {
-    const rooms = await Rooms.find();
+    const rooms = await Rooms.find()
+      .populate('roomType')
+      .populate('housekeeping');
     res.status(200).json({ rooms });
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -13,11 +17,11 @@ export const getAllRooms = async (req, res) => {
 // POST /api/room-rack
 export const createRoom = async (req, res) => {
   try {
-    const existingRoom = await Rooms.findOne({ number: req.body.roomNumber });
+    const existingRoom = await Rooms.findOne({ roomNumber: req.body.roomNumber });
     if (existingRoom) {
       return res.status(409).json({ message: "Room number already exists" });
     }
-    const room = new Rooms({ ...req.body, housekeeping: "Clean" });
+    const room = new Rooms(req.body);
     await room.save();
     res.status(201).json({ message: "Room created successfully", room });
   } catch (error) {
@@ -25,7 +29,7 @@ export const createRoom = async (req, res) => {
   }
 };
 
-// PUT /api/room-rack
+// PUT /api/room-rack/:id
 export const updateRoom = async (req, res) => {
   try {
     const { id } = req.params;
@@ -44,7 +48,7 @@ export const updateRoom = async (req, res) => {
   }
 };
 
-// DELETE /api/room-rack
+// DELETE /api/room-rack/:id
 export const deleteRoom = async (req, res) => {
   try {
     const { id } = req.params;
@@ -58,4 +62,3 @@ export const deleteRoom = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
-

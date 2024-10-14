@@ -1,4 +1,4 @@
-import mongoose, { mongo } from "mongoose";
+import mongoose from "mongoose";
 
 const roomSchema = new mongoose.Schema({
     roomNumber: {
@@ -7,19 +7,21 @@ const roomSchema = new mongoose.Schema({
     },
     roomType: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'RoomType',
+        ref: 'RoomDetail',
         required: true,
-      },
+    },
     roomStatus: {
         type: String,
         required: true,
+        enum: ['Vacant', 'Occupied', 'Maintenance', 'Out Of Order'],
     },
     housekeeping: {
-        type: String,
-        required: true,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Housekeeping',
+        required: false,
     },
-})
+});
 
-const Rooms = mongoose.model('Rooms', roomSchema);
+const Room = mongoose.model('Room', roomSchema);
 
-export default Rooms;
+export default Room;

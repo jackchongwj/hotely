@@ -17,6 +17,7 @@ import Chat from "components/Chat/Chat";
 import RoomSettings from "components/RoomSettings/RoomSettings";
 import Login from "components/Auth/Login";
 import Register from "components/Auth/Register";
+import Housekeeping from "components/Housekeeping/Housekeeping";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useAuth(); 
@@ -47,6 +48,7 @@ function App() {
                   <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
                   <Route path="/reservation-list" element={<ProtectedRoute><ReservationList /></ProtectedRoute>} />
                   <Route path="/room-rack" element={<ProtectedRoute><RoomRack /></ProtectedRoute>} />
+                  <Route path="/housekeeping" element={<ProtectedRoute><Housekeeping /></ProtectedRoute>} />
                   <Route path="/guests" element={<ProtectedRoute><Guests /></ProtectedRoute>} />
                   <Route path="/inventory" element={<ProtectedRoute><Inventory /></ProtectedRoute>} />
                   <Route path="/room-settings" element={<ProtectedRoute><RoomSettings /></ProtectedRoute>} />

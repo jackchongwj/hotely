@@ -15,6 +15,7 @@ import {
 import {
     ChevronLeft,
     ChevronRightOutlined,
+    DashboardOutlined,
     HomeOutlined,
     ListOutlined,
     BedOutlined,
@@ -31,7 +32,7 @@ import FlexBetween from "./FlexBetween";
 const navItems = [
   {
     text: "Dashboard",
-    icon: <HomeOutlined />,
+    icon: <DashboardOutlined />,
     route: "dashboard",
   },
   {
@@ -43,6 +44,11 @@ const navItems = [
     text: "Room Rack",
     icon: <BedOutlined />,
     route: "room-rack",
+  },
+  {
+    text: "Housekeeping",
+    icon: <HomeOutlined />,
+    route: "housekeeping",
   },
   {
     text: "Guests",
@@ -89,7 +95,7 @@ const Sidebar = ({
           sx={{
             width: drawerWidth,
             "& .MuiDrawer-paper": {
-              color: theme.palette.secondary[200],
+              color: theme.palette.text.primary,
               backgroundColor: theme.palette.background.alt,
               boxSixing: "border-box",
               borderWidth: isNonMobile ? 0 : "2px",

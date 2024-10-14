@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import Counter from "./Counter.js";
 
 const reservationSchema = new mongoose.Schema({
   reservationId: {
@@ -6,7 +7,8 @@ const reservationSchema = new mongoose.Schema({
     required: true,
   },
   customerId: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Guest", 
     required: true,
   },
   numAdults: {
@@ -31,15 +33,7 @@ const reservationSchema = new mongoose.Schema({
   },
   roomType: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "RoomDetail", 
-  },
-  price: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: "RoomDetail" 
-  },
-  leadTime: {
-    type: Number,
-    required: true,
+    ref: "RoomDetail",
   },
   bookingChannel: {
     type: String,
@@ -57,13 +51,36 @@ const reservationSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  room: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Room",
+    required: false,
+  },
 });
 
+// Function to get the next sequence value from the counters collection
+async function getNextSequenceValue(sequenceName) {
+  const counter = await Counter.findByIdAndUpdate(
+    { _id: sequenceName },
+    { $inc: { seq: 1 } },
+    { new: true, upsert: true }
+  );
+  return counter.seq;
+}
+
+// Static method to get the next sequence value and create reservation
+reservationSchema.statics.createWithNextId = async function (customerId, otherFields) {
+  const reservationId = await getNextSequenceValue('reservation_id');
+  return this.create({ reservationId, customerId, ...otherFields });
+};
+
+
+// Static method to set cancelled to true
 reservationSchema.statics.cancelById = async function (id) {
   const reservation = await this.findByIdAndUpdate(id, { cancelled: true }, { new: true });
   return reservation;
 };
 
-const Reservations = mongoose.model("Reservations", reservationSchema);
+const Reservation = mongoose.model("Reservation", reservationSchema);
 
-export default Reservations;
+export default Reservation;

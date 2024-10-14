@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { TextField, Button, DialogContent, DialogActions, Select, MenuItem, FormControl, InputLabel } from "@mui/material";
+import { TextField, Button, DialogContent, DialogActions, Select, MenuItem, FormControl, InputLabel, Autocomplete } from "@mui/material";
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -7,9 +7,12 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
 import axios from 'axios';
 
+const BASE_URL = "http://localhost:5001/api"; 
+
 const AddReservationDialog = ({ onSubmit, onCancel }) => {
   const today = dayjs();
   const [roomTypes, setRoomTypes] = useState([]);
+  const [customers, setCustomers] = useState([]);
   const bookingChannels = ["Walk-in", "Website", "Agoda.com", "Expedia.com", "Others"];
   const [reservation, setReservation] = useState({
     customerId: '',
@@ -26,7 +29,7 @@ const AddReservationDialog = ({ onSubmit, onCancel }) => {
   useEffect(() => {
     const fetchRoomTypes = async () => {
       try {
-        const response = await axios.get("http://localhost:5001/api/room-detail");
+        const response = await axios.get(`${BASE_URL}/room-detail`);
         setRoomTypes(response.data.roomDetails);
       } catch (error) {
         console.error('Error fetching room types:', error);
@@ -71,6 +74,21 @@ const AddReservationDialog = ({ onSubmit, onCancel }) => {
     setReservation(prev => ({ ...prev, [field]: date ? date.$d : null }));
   };
 
+  const handleCustomerSearch = async (event, value) => {
+    if (value) {
+      try {
+        const response = await axios.get(`${BASE_URL}/guests`, {
+          params: { search: value },
+        });
+        setCustomers(response.data.guests);
+      } catch (error) {
+        console.error('Error fetching customers:', error);
+      }
+    } else {
+      setCustomers([]);
+    }
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
 
@@ -97,7 +115,13 @@ const AddReservationDialog = ({ onSubmit, onCancel }) => {
   return (
     <>
       <DialogContent>
-        <TextField autoComplete="off" name="customerId" label="Customer ID" fullWidth margin="normal" onChange={handleChange} />
+        <Autocomplete
+          freeSolo
+          options={customers.map(customer => customer.customerId)}
+          onInputChange={handleCustomerSearch}
+          onChange={(event, newValue) => setReservation(prev => ({ ...prev, customerId: newValue }))}
+          renderInput={(params) => <TextField {...params} label="Customer ID" fullWidth margin="normal" />}
+        />
         <TextField autoComplete="off" type="number" inputProps={{ min: 0 }} name="numAdults" label="Adults" fullWidth margin="normal" onChange={handleChange} />
         <TextField autoComplete="off" type="number" inputProps={{ min: 0 }} name="numChildren" label="Children" fullWidth margin="normal" onChange={handleChange} />
         <FormControl fullWidth margin="normal">
@@ -117,31 +141,31 @@ const AddReservationDialog = ({ onSubmit, onCancel }) => {
           </Select>
         </FormControl>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <DemoContainer components={['DatePicker']}>
-          <DatePicker
-            autoComplete="off"
-            name="arrivalDate"
-            label="Arrival Date"
-            sx={{ width: "100%" }}
-            minDate={today}
-            onChange={(date) => handleDateChange(date, "arrivalDate")}
-            renderInput={(params) => <TextField {...params} />}
-          />
-        </DemoContainer>
-      </LocalizationProvider>
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <DemoContainer components={['DatePicker']}>
-          <DatePicker
-            autoComplete="off"
-            name="departureDate"
-            label="Departure Date"
-            sx={{ width: "100%" }}
-            minDate={today}
-            onChange={(date) => handleDateChange(date, "departureDate")}
-            renderInput={(params) => <TextField {...params} />}
-          />
-        </DemoContainer>
-      </LocalizationProvider>
+          <DemoContainer components={['DatePicker']}>
+            <DatePicker
+              autoComplete="off"
+              name="arrivalDate"
+              label="Arrival Date"
+              sx={{ width: "100%" }}
+              minDate={today}
+              onChange={(date) => handleDateChange(date, "arrivalDate")}
+              renderInput={(params) => <TextField {...params} />}
+            />
+          </DemoContainer>
+        </LocalizationProvider>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DemoContainer components={['DatePicker']}>
+            <DatePicker
+              autoComplete="off"
+              name="departureDate"
+              label="Departure Date"
+              sx={{ width: "100%" }}
+              minDate={today}
+              onChange={(date) => handleDateChange(date, "departureDate")}
+              renderInput={(params) => <TextField {...params} />}
+            />
+          </DemoContainer>
+        </LocalizationProvider>
         <FormControl fullWidth margin="normal">
           <InputLabel id="booking-channel-label">Booking Channel</InputLabel>
           <Select

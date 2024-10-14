@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import Counter from "./Counter.js";
 
 const guestSchema = new mongoose.Schema({
   customerId: {
@@ -39,6 +40,22 @@ const guestSchema = new mongoose.Schema({
   },
 });
 
-const Guests = mongoose.model("Guests", guestSchema);
+// Static method to create a guest with the next customerId
+guestSchema.statics.createWithNextId = async function (firstName, lastName, otherFields) {
+  const customerId = await getNextSequenceValue('customer_id');
+  return this.create({ customerId, firstName, lastName, ...otherFields });
+};
 
-export default Guests;
+// Function to get the next sequence value from the counters collection
+async function getNextSequenceValue(sequenceName) {
+  const counter = await Counter.findByIdAndUpdate(
+    { _id: sequenceName },
+    { $inc: { seq: 1 } },
+    { new: true, upsert: true }
+  );
+  return counter.seq;
+}
+
+const Guest = mongoose.model('Guest', guestSchema);
+
+export default Guest;

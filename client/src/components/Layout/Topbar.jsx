@@ -131,7 +131,7 @@ const Topbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                 <Typography
                   fontWeight="bold"
                   fontSize="0.85rem"
-                  sx={{ color: theme.palette.secondary[100] }}
+                  sx={{ color: theme.palette.grey[0] }}
                 >
                   {`${user.fname} ${user.lname}`}
                 </Typography>
@@ -143,7 +143,7 @@ const Topbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                 </Typography>
               </Box>
               <ArrowDropDown
-                sx={{ color: theme.palette.secondary[300], fontSize: "25px" }}
+                sx={{ color: theme.palette.secondary[200], fontSize: "25px" }}
               />
             </Button>
             <Menu

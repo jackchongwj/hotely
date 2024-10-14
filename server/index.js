@@ -51,7 +51,7 @@ connectDB().then(() => {
     pingTimeout: 60000,
     cors: { origin: "http://localhost:3000" },
   });
-
+  
   io.on('connection', (socket) => {
     console.log("Connected to socket.io");
   });
