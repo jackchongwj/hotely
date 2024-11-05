@@ -56,6 +56,8 @@ const reservationSchema = new mongoose.Schema({
     ref: "Room",
     required: false,
   },
+  created_at: { type: Date, default: Date.now },
+  modified_at: { type: Date, default: Date.now },
 });
 
 // Function to get the next sequence value from the counters collection

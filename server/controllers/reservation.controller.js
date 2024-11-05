@@ -1,4 +1,5 @@
 import Reservation from "../models/Reservation.js";
+import Room from "../models/Room.js";
 
 export const getAllReservations = async (req, res) => {
   try {
@@ -59,14 +60,26 @@ export const cancelReservation = async (req, res) => {
 
 export const checkInReservation = async (req, res) => {
   try {
-    const reservation = await Reservation.findById(req.params.id);
-    if (!reservation) return res.status(404).json({ error: 'Reservation not found' });
+    const { id } = req.params;
+    const { roomId } = req.body; // Expect roomId to be provided in the request body
 
-    reservation.checkedIn = true;
-    await reservation.save();
-    res.status(200).json({ message: 'Reservation checked in successfully' });
+    // Update reservation to check-in and assign room
+    const reservation = await Reservation.findByIdAndUpdate(
+      id,
+      { checkedIn: true, room: roomId },
+      { new: true }
+    );
+
+    if (!reservation) {
+      return res.status(404).json({ error: "Reservation not found" });
+    }
+
+    // Update room status to Occupied
+    await Room.findByIdAndUpdate(roomId, { roomStatus: "Occupied" });
+
+    res.status(200).json({ message: "Checked in successfully", reservation });
   } catch (error) {
-    res.status(500).json({ error: error });
+    res.status(500).json({ error: "Error during check-in." });
   }
 };
 

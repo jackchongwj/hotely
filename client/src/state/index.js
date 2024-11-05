@@ -1,7 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+// Retrieve the initial mode from localStorage or set to 'dark' by default
+const initialMode = localStorage.getItem("mode") || "dark";
+
 const initialState = {
-  mode: "dark",
+  mode: initialMode,
 };
 
 export const globalSlice = createSlice({
@@ -10,6 +13,8 @@ export const globalSlice = createSlice({
   reducers: {
     setMode: (state) => {
       state.mode = state.mode === "light" ? "dark" : "light";
+      // Save the mode in localStorage
+      localStorage.setItem("mode", state.mode);
     },
   },
 });

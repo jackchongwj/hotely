@@ -197,7 +197,7 @@ const RoomRack = () => {
               flexDirection: "column",
               justifyContent: "center",
               alignItems: "center",
-              backgroundColor: theme.palette.mode === "dark" ? "#36454F" : "#f5f5f5"
+              backgroundColor: theme.palette.secondary.light
             }}
           >
             <CardContent sx={{ flexGrow: 1, textAlign: 'center' }}>

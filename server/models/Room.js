@@ -20,6 +20,11 @@ const roomSchema = new mongoose.Schema({
         ref: 'Housekeeping',
         required: false,
     },
+    currentReservation: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Reservation",
+        required: false,
+      },
 });
 
 const Room = mongoose.model('Room', roomSchema);

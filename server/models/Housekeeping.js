@@ -32,7 +32,7 @@ const housekeepingSchema = new mongoose.Schema({
     },
     room: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Rooms',
+        ref: 'Room',
         required: true,
     },
 });

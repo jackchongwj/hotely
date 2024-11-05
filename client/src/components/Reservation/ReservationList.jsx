@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid";
-import { Box, Typography, Button, Dialog, Alert, Snackbar } from "@mui/material";
+import { Box, Typography, Button, Dialog, DialogContent, DialogTitle, MenuItem, Select, Snackbar, Alert } from "@mui/material";
 import axios from "axios";
 import AddReservationDialog from "./AddReservationDialog";
 import { format, differenceInDays } from "date-fns";
 
 const BASE_URL = "http://localhost:5001/api/reservation-list";
+const ROOM_URL = "http://localhost:5001/api/rooms";
 
 const ReservationList = () => {
   const [selectedRowId, setSelectedRowId] = useState(null);
   const [rows, setRows] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [roomDialogOpen, setRoomDialogOpen] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState("");
+  const [availableRooms, setAvailableRooms] = useState([]);
   const [alert, setAlert] = useState({ open: false, severity: "", message: "" }); // Alert state for notifications
   const [page, setPage] = useState(0); // DataGrid page starts at 0
   const [pageSize, setPageSize] = useState(10);
@@ -60,6 +64,15 @@ const ReservationList = () => {
     }
   };
 
+  const fetchAvailableRooms = async (roomTypeId) => {
+    try {
+      const response = await axios.get(`${ROOM_URL}/available?roomType=${roomTypeId}`);
+      setAvailableRooms(response.data);
+    } catch (error) {
+      showAlert("error", "Error fetching available rooms.");
+    }
+  };
+
   useEffect(() => {
     fetchReservations(page, pageSize);
   }, [page, pageSize]); // Fetch data whenever page or pageSize changes
@@ -81,35 +94,33 @@ const ReservationList = () => {
     setPage(0); // Reset to the first page when page size changes
   };
 
-  const handleCheckIn = async (id) => {
-    console.log("Check-in initiated for ID:", id);
-    try {
-      setRows(rows.map((row) => row._id === id ? { ...row, checkedIn: true } : row));
-      const response = await axios.put(`${BASE_URL}/${id}/check-in`);
-      if (response.status !== 200) {
-        throw new Error('Error checking in');
-      }
-      showAlert("success", "Checked in successfully.");
-    } catch (error) {
-      setRows(rows.map((row) => row._id === id ? { ...row, checkedIn: false } : row));
-      showAlert("error", "Error checking in reservation.");
-      console.error("Error checking in reservation:", error);
+  const handleCheckIn = async () => {
+    const selectedRow = rows.find(row => row._id === selectedRowId);
+    if (selectedRow && selectedRow.checkedIn === false) {
+      await fetchAvailableRooms(selectedRow.roomType._id);
+      setRoomDialogOpen(true);
     }
   };
 
-  const handleCheckOut = async (id) => {
-    console.log("Check-out initiated for ID:", id);
+  const handleConfirmCheckIn = async () => {
     try {
-      setRows(rows.map((row) => row._id === id ? { ...row, checkedOut: true } : row));
-      const response = await axios.put(`${BASE_URL}/${id}/check-out`);
-      if (response.status !== 200) {
-        throw new Error('Error checking out');
-      }
+      await axios.put(`${BASE_URL}/${selectedRowId}/check-in`, { roomId: selectedRoom });
+      setRows(rows.map((row) => (row._id === selectedRowId ? { ...row, checkedIn: true, room: selectedRoom } : row)));
+      showAlert("success", "Checked in successfully.");
+    } catch (error) {
+      showAlert("error", "Error checking in reservation.");
+    } finally {
+      setRoomDialogOpen(false);
+    }
+  };
+
+  const handleCheckOut = async () => {
+    try {
+      await axios.put(`${BASE_URL}/${selectedRowId}/check-out`);
+      setRows(rows.map((row) => (row._id === selectedRowId ? { ...row, checkedOut: true } : row)));
       showAlert("success", "Checked out successfully.");
     } catch (error) {
-      setRows(rows.map((row) => row._id === id ? { ...row, checkedOut: false } : row));
       showAlert("error", "Error checking out reservation.");
-      console.error("Error checking out reservation:", error);
     }
   };
 
@@ -144,8 +155,9 @@ const ReservationList = () => {
   };
   
   // Determine if the Check-in and Check-out buttons should be enabled or disabled
-  const isCheckInDisabled = selectedRowId === null || rows.find(row => row._id === selectedRowId)?.checkedIn;
-  const isCheckOutDisabled = selectedRowId === null || rows.find(row => row._id === selectedRowId)?.checkedOut;
+  const selectedRow = rows.find(row => row._id === selectedRowId);
+  const isCheckInDisabled = selectedRowId === null || selectedRow?.checkedIn;
+  const isCheckOutDisabled = selectedRowId === null || !selectedRow?.checkedIn || selectedRow?.checkedOut;
 
   return (
     <Box m="1.5rem 2.5rem">
@@ -156,17 +168,16 @@ const ReservationList = () => {
         <Box display="flex">
           <Button
             variant="contained"
-            color="primary"
-            sx={{ mr: 2 }}
-            onClick={() => selectedRowId && handleCheckIn(selectedRowId)}
+            sx={{ mr: 2, backgroundColor: theme => theme.palette.secondary.light }} 
+            onClick={handleCheckIn}
             disabled={isCheckInDisabled}
           >
             Check-in
           </Button>
           <Button
             variant="contained"
-            color="primary"
-            onClick={() => selectedRowId && handleCheckOut(selectedRowId)}
+            sx={{ backgroundColor: theme => theme.palette.secondary.light }} 
+            onClick={handleCheckOut}
             disabled={isCheckOutDisabled}
           >
             Check-out
@@ -175,8 +186,7 @@ const ReservationList = () => {
         <Box display="flex">
           <Button
             variant="contained"
-            color="primary"
-            sx={{ mr: 2 }}
+            sx={{ mr: 2, backgroundColor: theme => theme.palette.secondary.light }} 
             onClick={() => setDialogOpen(true)}
           >
             Add Reservation
@@ -189,7 +199,7 @@ const ReservationList = () => {
           </Dialog>
           <Button
             variant="contained"
-            color="primary"
+            sx={{ backgroundColor: theme => theme.palette.secondary.light }} 
             onClick={() => selectedRowId && cancelReservation(selectedRowId)}
           >
             Cancel Reservation
@@ -213,6 +223,26 @@ const ReservationList = () => {
         onPageSizeChange={handlePageSizeChange}
         page={page}
       />
+
+      {/* Room selection dialog */}
+      <Dialog open={roomDialogOpen} onClose={() => setRoomDialogOpen(false)}>
+        <DialogTitle>Select Room for Check-In</DialogTitle>
+        <DialogContent>
+          <Select
+            fullWidth
+            value={selectedRoom}
+            onChange={(e) => setSelectedRoom(e.target.value)}
+            displayEmpty
+          >
+            <MenuItem value="" disabled>Select Room</MenuItem>
+            {availableRooms.map((room) => (
+              <MenuItem key={room._id} value={room._id}>{room.roomNumber}</MenuItem>
+            ))}
+          </Select>
+        </DialogContent>
+        <Button onClick={handleConfirmCheckIn} disabled={!selectedRoom}>Confirm</Button>
+      </Dialog>
+
       {/* Snackbar for alerts */}
       <Snackbar
         open={alert.open}

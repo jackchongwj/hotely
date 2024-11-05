@@ -1,5 +1,7 @@
+/* Import Font */
 @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700&display=swap');
 
+/* Global Styles */
 html,
 body,
 #root,
@@ -9,23 +11,29 @@ body,
   font-family: "Barlow", sans-serif;
 }
 
+/* Scrollbar Styles */
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 8px;
+  background-color: #E5E4E2; /* Light grey background for track */
 }
 
 /* Track */
 ::-webkit-scrollbar-track {
-  background: #7a7f9d;
+  background: #E5E4E2; /* Light grey color to match the theme */
+  border-radius: 10px; /* Rounded edges */
+  margin: 4px; /* Adds padding on top/bottom of the scrollbar track */
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: #21295c;
+  background-color: #21295c; /* Dark blue thumb color */
+  border-radius: 10px; /* Rounded thumb for a smoother look */
+  border: 2px solid #E5E4E2; /* Adds padding and a border for thumb */
 }
 
 /* Handle on Hover */
-::-webkit-scrollbar-track:hover {
-  background: #21295c;
+::-webkit-scrollbar-thumb:hover {
+  background-color: #16638F; /* Slightly lighter blue on hover */
 }
 
 /* Override autofill styles in WebKit-based browsers */

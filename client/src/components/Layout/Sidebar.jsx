@@ -96,7 +96,7 @@ const Sidebar = ({
             width: drawerWidth,
             "& .MuiDrawer-paper": {
               color: theme.palette.text.primary,
-              backgroundColor: theme.palette.background.alt,
+              backgroundColor: theme.palette.secondary.main,
               boxSixing: "border-box",
               borderWidth: isNonMobile ? 0 : "2px",
               width: drawerWidth,
@@ -136,12 +136,12 @@ const Sidebar = ({
                       sx={{
                         backgroundColor:
                           active === route
-                            ? theme.palette.secondary[300]
+                            ? theme.palette.secondary
                             : "transparent",
                         color:
                           active === route
-                            ? theme.palette.primary[600]
-                            : theme.palette.secondary[100],
+                            ? theme.palette.primary
+                            : theme.palette.secondary,
                       }}
                     >
                       <ListItemIcon
@@ -149,8 +149,8 @@ const Sidebar = ({
                           ml: "2rem",
                           color:
                             active === route
-                              ? theme.palette.primary[600]
-                              : theme.palette.secondary[200],
+                              ? theme.palette.primary
+                              : theme.palette.secondary,
                         }}
                       >
                         {icon}

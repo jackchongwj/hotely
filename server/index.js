@@ -6,6 +6,8 @@ import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import { Server } from 'socket.io';
 import connectDB from './config/db.js';
+import Reservation from './models/Reservation.js';
+import Room from './models/Room.js';
 
 // Import routes
 import authRoutes from './routes/auth.routes.js';

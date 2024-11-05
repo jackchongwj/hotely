@@ -7,7 +7,7 @@ import { useAuth, AuthProvider } from "context/authContext";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { themeSettings } from "theme";
 
-import Layout from "components/Layout/Layout";
+import Layout from "layout/Layout";
 import Dashboard from "components/Dashboard/Dashboard";
 import ReservationList from "components/Reservation/ReservationList";
 import RoomRack from "components/RoomRack/RoomRack";
@@ -27,7 +27,6 @@ const ProtectedRoute = ({ children }) => {
   }
   return children;
 };
-
 
 function App() {
   const mode = useSelector((state) => state.global.mode);
