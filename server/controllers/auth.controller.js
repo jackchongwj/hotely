@@ -30,10 +30,18 @@ export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
-    if (!user || !(await bcrypt.compare(password, user.password))) {
+
+    if (!user) {
+      throw new ErrorHandler(400, "User not found.");
+    }
+    if (!(await bcrypt.compare(password, user.password))) {
       throw new ErrorHandler(400, "Invalid credentials.");
     }
+    if (!user.role) {
+      throw new ErrorHandler(400, "Account not verified.")
+    }
     
+    // Generate tokens
     const { accessToken, refreshToken } = await generateTokens(user);
 
     // Set cookies for tokens

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import AssignTaskDialog from "./AssignTaskDialog";
 import {
   Box,
   Card,
@@ -31,15 +32,22 @@ const RoomRack = () => {
     status: "all",
   });
   const [filterDialogOpen, setFilterDialogOpen] = useState(false);
+  const [assignTaskDialogOpen, setAssignTaskDialogOpen] = useState(false);
+  const [selectedRoomForTask, setSelectedRoomForTask] = useState(null);
 
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        const response = await axios.get("http://localhost:5001/api/room-rack", {
-          withCredentials: true,
-        });
-        const sortedRooms = response.data.rooms.sort((a, b) => a.roomNumber - b.roomNumber);
-        
+        const response = await axios.get(
+          "http://localhost:5001/api/room-rack",
+          {
+            withCredentials: true,
+          }
+        );
+        const sortedRooms = response.data.rooms.sort(
+          (a, b) => a.roomNumber - b.roomNumber
+        );
+
         // Apply housekeeping logic
         const updatedRooms = sortedRooms.map((room) => {
           if (room.roomStatus === "Vacant" && !room.housekeeping) {
@@ -52,7 +60,7 @@ const RoomRack = () => {
 
         setRooms(updatedRooms);
       } catch (error) {
-        console.error('Error fetching rooms:', error);
+        console.error("Error fetching rooms:", error);
       }
     };
     fetchRooms();
@@ -66,7 +74,9 @@ const RoomRack = () => {
       );
       const updatedRoom = response.data.room;
       setRooms((prevRooms) =>
-        prevRooms.map((room) => (room._id === updatedRoom._id ? updatedRoom : room))
+        prevRooms.map((room) =>
+          room._id === updatedRoom._id ? updatedRoom : room
+        )
       );
     } catch (error) {
       console.log(error);
@@ -84,16 +94,60 @@ const RoomRack = () => {
   };
 
   const handleMenuOptionClick = (option) => {
-    console.log(`Selected option ${option} for room ${selectedRoom.roomNumber}`);
+    switch (option) {
+      case "assignTask":
+        handleAssignTask(selectedRoom._id);
+        break;
+      case "addNotes":
+        handleAddNotes(selectedRoom._id);
+        break;
+      case "viewDetails":
+        handleViewDetails(selectedRoom);
+        break;
+      case "changeStatus":
+        handleChangeStatus(selectedRoom._id);
+        break;
+      default:
+        break;
+    }
     handleMenuClose();
+  };
+
+  const handleAssignTask = (roomId) => {
+    setSelectedRoomForTask(roomId);
+    setAssignTaskDialogOpen(true);
+  };
+
+  const handleCloseAssignTaskDialog = () => {
+    setAssignTaskDialogOpen(false);
+    setSelectedRoomForTask(null);
+  };
+
+  const handleTaskAssigned = (newTask) => {
+    console.log("Task assigned:", newTask);
+  };
+
+  const handleAddNotes = (roomId) => {
+    console.log(`Add notes for room ${roomId}`);
+  };
+
+  const handleViewDetails = (room) => {
+    console.log("View details for room:", room);
+  };
+
+  const handleChangeStatus = (roomId) => {
+    console.log(`Change status for room ${roomId}`);
   };
 
   const applyFilters = (rooms) => {
     return rooms.filter((room) => {
       const matchesAvailability =
-        filters.availability === "all" || room.roomStatus === filters.availability;
-      const matchesType = filters.type === "all" || room.roomType === filters.type;
-      const matchesStatus = filters.status === "all" || room.housekeeping === filters.status;
+        filters.availability === "all" ||
+        room.roomStatus === filters.availability;
+      const matchesType =
+        filters.type === "all" || room.roomType === filters.type;
+      const matchesStatus =
+        filters.status === "all" || room.housekeeping === filters.status;
       return matchesAvailability && matchesType && matchesStatus;
     });
   };
@@ -115,72 +169,76 @@ const RoomRack = () => {
 
   return (
     <Box m="1.5rem 2.5rem">
-      <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Typography variant="h3" sx={{ marginTop: "1rem", marginBottom: "1rem" }}>
+      <Box display="flex" justifyContent="space-between">
+        <Typography
+          variant="h3"
+          sx={{ marginTop: "1rem", marginBottom: "1rem" }}
+        >
           Room Rack
         </Typography>
+      </Box>
+      <Box display="flex" justifyContent="space-between" mb={2}>
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Box
+            sx={{
+              width: "1.5rem",
+              height: "1.5rem",
+              borderRadius: "50%",
+              backgroundColor: "green",
+              mr: 0.5,
+            }}
+          ></Box>
+          <Typography variant="subtitle1" sx={{ fontSize: "0.9rem", mr: 2 }}>
+            Vacant
+          </Typography>
+          <Box
+            sx={{
+              width: "1.5rem",
+              height: "1.5rem",
+              borderRadius: "50%",
+              backgroundColor: "yellow",
+              mr: 0.5,
+            }}
+          ></Box>
+          <Typography variant="subtitle1" sx={{ fontSize: "0.9rem", mr: 2 }}>
+            Occupied
+          </Typography>
+          <Box
+            sx={{
+              width: "1.5rem",
+              height: "1.5rem",
+              borderRadius: "50%",
+              backgroundColor: "blue",
+              mr: 0.5,
+            }}
+          ></Box>
+          <Typography variant="subtitle1" sx={{ fontSize: "0.9rem", mr: 2 }}>
+            Reserved
+          </Typography>
+          <Box
+            sx={{
+              width: "1.5rem",
+              height: "1.5rem",
+              borderRadius: "50%",
+              backgroundColor: "red",
+              mr: 0.5,
+            }}
+          ></Box>
+          <Typography variant="subtitle1" sx={{ fontSize: "0.9rem" }}>
+            Out of Order
+          </Typography>
+        </Box>
         <Button
           variant="contained"
-          color="primary"
+          sx={{
+            mr: 2,
+            backgroundColor: (theme) => theme.palette.secondary.light,
+          }}
           startIcon={<FilterList />}
           onClick={handleFilterDialogOpen}
         >
           Filters
         </Button>
-      </Box>
-      <Box display="flex" justifyContent="space-between" mb={2}>
-        <Box sx={{ display: "inline-block" }}>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Box
-              sx={{
-                width: "1.5rem",
-                height: "1.5rem",
-                borderRadius: "50%",
-                backgroundColor: "green",
-                mr: 0.5,
-              }}
-            ></Box>
-            <Typography variant="subtitle1" sx={{ fontSize: "0.9rem", mr: 2 }}>
-              Vacant
-            </Typography>
-            <Box
-              sx={{
-                width: "1.5rem",
-                height: "1.5rem",
-                borderRadius: "50%",
-                backgroundColor: "yellow",
-                mr: 0.5,
-              }}
-            ></Box>
-            <Typography variant="subtitle1" sx={{ fontSize: "0.9rem", mr: 2 }}>
-              Occupied
-            </Typography>
-            <Box
-              sx={{
-                width: "1.5rem",
-                height: "1.5rem",
-                borderRadius: "50%",
-                backgroundColor: "blue",
-                mr: 0.5,
-              }}
-            ></Box>
-            <Typography variant="subtitle1" sx={{ fontSize: "0.9rem", mr: 2 }}>
-              Reserved
-            </Typography>
-            <Box
-              sx={{
-                width: "1.5rem",
-                height: "1.5rem",
-                borderRadius: "50%",
-                backgroundColor: "red",
-                mr: 0.5,
-              }}
-            ></Box>
-            <Typography variant="subtitle1" sx={{ fontSize: "0.9rem" }}>
-              Out of Order
-            </Typography>
-          </Box>
-        </Box>
       </Box>
 
       <Box display="flex" flexWrap="wrap" justifyContent="center">
@@ -197,10 +255,10 @@ const RoomRack = () => {
               flexDirection: "column",
               justifyContent: "center",
               alignItems: "center",
-              backgroundColor: theme.palette.secondary.light
+              backgroundColor: theme.palette.secondary.light,
             }}
           >
-            <CardContent sx={{ flexGrow: 1, textAlign: 'center' }}>
+            <CardContent sx={{ flexGrow: 1, textAlign: "center" }}>
               <FormControl variant="standard" sx={{ mt: 2, minWidth: "100%" }}>
                 <Select
                   value={room.housekeeping.status}
@@ -233,7 +291,6 @@ const RoomRack = () => {
               <Typography variant="subtitle1" sx={{ fontSize: 14 }}>
                 {room.roomType.name}
               </Typography>
-
             </CardContent>
             <Box
               display="flex"
@@ -275,7 +332,9 @@ const RoomRack = () => {
             <InputLabel>Room Availability</InputLabel>
             <Select
               value={filters.availability}
-              onChange={(e) => handleFilterChange("availability", e.target.value)}
+              onChange={(e) =>
+                handleFilterChange("availability", e.target.value)
+              }
             >
               <MenuItem value="all">All</MenuItem>
               <MenuItem value="Vacant">Vacant</MenuItem>
@@ -309,6 +368,12 @@ const RoomRack = () => {
           </FormControl>
         </DialogContent>
       </Dialog>
+      <AssignTaskDialog
+        open={assignTaskDialogOpen}
+        onClose={handleCloseAssignTaskDialog}
+        roomId={selectedRoomForTask}
+        onTaskAssigned={handleTaskAssigned}
+      />
     </Box>
   );
 };

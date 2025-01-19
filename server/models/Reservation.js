@@ -61,7 +61,7 @@ const reservationSchema = new mongoose.Schema({
 });
 
 // Function to get the next sequence value from the counters collection
-async function getNextSequenceValue(sequenceName) {
+export async function getNextSequenceValue(sequenceName) {
   const counter = await Counter.findByIdAndUpdate(
     { _id: sequenceName },
     { $inc: { seq: 1 } },

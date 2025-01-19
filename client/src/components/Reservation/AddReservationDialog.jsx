@@ -18,7 +18,7 @@ const AddReservationDialog = ({ onSubmit, onCancel }) => {
     customerId: '',
     numAdults: '',
     numChildren: '',
-    daysOfStay: '',
+    daysOfStay: 0,
     roomType: '',
     arrivalDate: '',
     departureDate: '',
@@ -94,7 +94,6 @@ const AddReservationDialog = ({ onSubmit, onCancel }) => {
 
     console.log("reservation", reservation);
 
-    // Check required fields only
     if (
       reservation.customerId &&
       reservation.numAdults !== '' && 

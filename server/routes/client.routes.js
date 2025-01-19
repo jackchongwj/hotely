@@ -4,6 +4,7 @@ import { dashboard, getOccupancy, getExpectedArrivals, getCurrentGuests, getExpe
 import { createReservation, getAllReservations, cancelReservation, checkOutReservation, checkInReservation } from '../controllers/reservation.controller.js';
 import { getAvailableRooms, createRoom, updateRoom, getAllRooms, deleteRoom } from '../controllers/room.controller.js'
 import { createGuest, deleteGuest, updateGuest, getAllGuests} from '../controllers/guest.controller.js'
+import { createTask, getAllTasks, getTasksByRoomId, updateTask, deleteTask } from '../controllers/housekeeping.controller.js';
 import { createRoomDetail, getAllRoomDetails, updateRoomDetail, deleteRoomDetail } from '../controllers/roomdetail.controller.js';
 
 const router = express.Router();
@@ -29,6 +30,13 @@ router.get('/room-rack', requireAuth, getAllRooms);
 router.post('/room-rack', requireAuth, createRoom);
 router.put('/room-rack/:id', requireAuth, updateRoom);
 router.delete('/room-rack/:id', requireAuth, deleteRoom);
+
+// Housekeeping routes
+router.post("/housekeeping", createTask); 
+router.get("/housekeeping", getAllTasks); 
+router.get("/housekeeping/:roomId", getTasksByRoomId); 
+router.put("/housekeeping/:id", updateTask);
+router.delete("/housekeeping/:id", deleteTask); 
 
 // Room Settings routes
 router.get('/room-detail', requireAdminAuth, getAllRoomDetails);

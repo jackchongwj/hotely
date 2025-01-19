@@ -4,6 +4,7 @@ const roomSchema = new mongoose.Schema({
     roomNumber: {
         type: Number,
         required: true,
+        unique: true,
     },
     roomType: {
         type: mongoose.Schema.Types.ObjectId,
@@ -14,6 +15,7 @@ const roomSchema = new mongoose.Schema({
         type: String,
         required: true,
         enum: ['Vacant', 'Occupied', 'Maintenance', 'Out Of Order'],
+        default: "Vacant",
     },
     housekeeping: {
         type: mongoose.Schema.Types.ObjectId,

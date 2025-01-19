@@ -1,4 +1,5 @@
 import Room from "../models/Room.js";
+import Housekeeping from "../models/Housekeeping.js";
 
 // Fetch available rooms by room type
 export const getAvailableRooms = async (req, res) => {

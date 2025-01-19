@@ -7,14 +7,17 @@ const housekeepingSchema = new mongoose.Schema({
     },
     description: {
         type: String,
+        required: true, 
     },
     status: {
         type: String,
-        default: "Pending",
+        enum: ["Pending", "In Progress", "Completed"],
+        required: true, 
     },
     priority: {
         type: String,
-        default: "Medium",
+        enum: ["Low", "Medium", "High"],
+        required: true, 
     },
     assignedTo: {
         type: mongoose.Schema.Types.ObjectId,
@@ -30,7 +33,7 @@ const housekeepingSchema = new mongoose.Schema({
     completedDate: {
         type: Date,
     },
-    room: {
+    roomId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Room',
         required: true,
