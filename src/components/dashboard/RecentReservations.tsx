@@ -9,9 +9,7 @@ const reservations = [
     checkIn: 'Oct 24, 2023',
     checkOut: 'Oct 28, 2023',
     status: 'Confirmed',
-    amount: '$1,240',
-    avatar:
-      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+    amount: '$1,240'
   },
   {
     id: 'RES-002',
@@ -20,9 +18,7 @@ const reservations = [
     checkIn: 'Oct 24, 2023',
     checkOut: 'Oct 26, 2023',
     status: 'Checked In',
-    amount: '$480',
-    avatar:
-      'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+    amount: '$480'
   },
   {
     id: 'RES-003',
@@ -31,9 +27,7 @@ const reservations = [
     checkIn: 'Oct 25, 2023',
     checkOut: 'Oct 27, 2023',
     status: 'Pending',
-    amount: '$320',
-    avatar:
-      'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+    amount: '$320'
   },
   {
     id: 'RES-004',
@@ -42,9 +36,7 @@ const reservations = [
     checkIn: 'Oct 26, 2023',
     checkOut: 'Oct 30, 2023',
     status: 'Confirmed',
-    amount: '$1,850',
-    avatar:
-      'https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+    amount: '$1,850'
   },
   {
     id: 'RES-005',
@@ -53,9 +45,7 @@ const reservations = [
     checkIn: 'Oct 23, 2023',
     checkOut: 'Oct 25, 2023',
     status: 'Checked Out',
-    amount: '$520',
-    avatar:
-      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+    amount: '$520'
   }
 ];
 
@@ -109,12 +99,6 @@ export function RecentReservations() {
               >
                 <td className="py-3 pl-2">
                   <div className="flex items-center gap-3">
-                    <img
-                      src={res.avatar}
-                      alt={res.guest}
-                      className="w-8 h-8 rounded-full object-cover"
-                    />
-
                     <span className="font-medium text-[#1e2433] dark:text-gray-100 text-sm">
                       {res.guest}
                     </span>

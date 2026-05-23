@@ -7,36 +7,28 @@ const checkins = [
     name: 'Alice Freeman',
     roomType: 'Ocean View Suite',
     time: '2:00 PM',
-    request: 'Early check-in',
-    avatar:
-      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+    request: 'Early check-in'
   },
   {
     id: 2,
     name: 'David Kim',
     roomType: 'Deluxe King',
     time: '3:30 PM',
-    request: 'Extra pillows',
-    avatar:
-      'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+    request: 'Extra pillows'
   },
   {
     id: 3,
     name: 'Emma Watson',
     roomType: 'Standard Twin',
     time: '4:15 PM',
-    request: null,
-    avatar:
-      'https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+    request: null
   },
   {
     id: 4,
     name: 'James Smith',
     roomType: 'Presidential Suite',
     time: '6:00 PM',
-    request: 'Champagne on ice',
-    avatar:
-      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+    request: 'Champagne on ice'
   }
 ];
 
@@ -58,12 +50,6 @@ export function UpcomingCheckins() {
             key={guest.id}
             className="flex items-start gap-4 p-3 rounded-lg hover:bg-[#f7f5f2] dark:hover:bg-gray-700/60 transition-colors border border-transparent hover:border-gray-100 dark:hover:border-gray-600"
           >
-            <img
-              src={guest.avatar}
-              alt={guest.name}
-              className="w-10 h-10 rounded-full object-cover border border-gray-200 dark:border-gray-600"
-            />
-
             <div className="flex-1 min-w-0">
               <div className="flex justify-between items-start">
                 <h4 className="text-sm font-semibold text-[#1e2433] dark:text-gray-100 truncate">
