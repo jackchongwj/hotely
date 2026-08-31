@@ -1,0 +1,35 @@
+import mongoose from "mongoose";
+
+const roomSchema = new mongoose.Schema({
+    roomNumber: {
+        type: Number,
+        required: true,
+        unique: true,
+    },
+    roomType: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'RoomDetail',
+        required: true,
+    },
+    roomStatus: {
+        type: String,
+        required: true,
+        enum: ['Vacant', 'Occupied', 'Maintenance', 'Out Of Order'],
+        default: "Vacant",
+    },
+    housekeeping: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Housekeeping',
+        required: false,
+    },
+    currentReservation: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Reservation",
+        required: false,
+      },
+    isDeleted: { type: Boolean, default: false, index: true },
+});
+
+const Room = mongoose.model('Room', roomSchema);
+
+export default Room;
